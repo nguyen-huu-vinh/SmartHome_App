@@ -1,0 +1,36 @@
+name: smarthome_app
+description: "Hoome – Smart Home Control App."
+publish_to: "none" # Ứng dụng riêng, không đăng lên pub.dev.
+
+# Phiên bản: <tên phiên bản>+<số build> (Android versionName/versionCode,
+# iOS CFBundleShortVersionString/CFBundleVersion).
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.0.0
+  flutter_svg: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/devices/
+    - assets/images/categories/
+    - assets/images/models/
+    - assets/images/home/
+    - assets/icons/
+    # Font Inter + Nunito đóng gói sẵn (google_fonts tự tìm theo tên file):
+    # chữ đúng thiết kế ngay lần mở đầu, kể cả khi không có mạng.
+    - assets/fonts/
