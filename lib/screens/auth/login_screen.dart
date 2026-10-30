@@ -6,6 +6,7 @@ import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../core/validators.dart';
 import '../../data/app_state.dart';
+import '../../data/auth_service.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/auth_layout.dart';
@@ -40,6 +41,20 @@ class _LoginScreenState extends State<LoginScreen> {
     final app = AppScope.read(context);
     app.updateProfile(app.profile.copyWith(email: _email.text.trim()));
     Navigator.push(context, riseRoute(const ManageHomesScreen()));
+  }
+
+  Future<void> _googleSignIn() async {
+    try {
+      final token = await signInWithGoogle();
+      if (!mounted) return;
+      if (token == null) {
+        context.toast('Google sign-in failed');
+        return;
+      }
+      Navigator.push(context, riseRoute(const ManageHomesScreen()));
+    } catch (_) {
+      if (mounted) context.toast('Google sign-in failed');
+    }
   }
 
   void _forgotPassword() {
@@ -107,8 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SocialButton(
               tooltip: 'Continue with Google',
               icon: AppIcon.google.widget(28),
-              onPressed: () =>
-                  context.toast('Sign in with Google is coming soon'),
+              onPressed: _googleSignIn,
             ),
             SocialButton(
               tooltip: 'Continue with phone number',
