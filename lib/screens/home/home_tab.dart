@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../core/routes.dart';
@@ -105,57 +107,60 @@ class _HomeTabState extends State<HomeTab> {
           onTap: _manageHomes,
         ),
         Expanded(
-          child: ListView(
-            controller: _scroll,
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.only(
-              top: 16,
-              bottom: FloatingNavBar.scrollPadding(context),
-            ),
-            children: [
-              _pad(
-                SearchBox(
-                  controller: _search,
-                  hint: 'Search Devices',
-                  onChanged: (v) => setState(() {
-                    _query = v;
-                    _resetPage();
-                  }),
-                ),
+          child: AppRefresh(
+            child: ListView(
+              controller: _scroll,
+              physics: const AlwaysScrollableScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.only(
+                top: 16,
+                bottom: FloatingNavBar.scrollPadding(context),
               ),
-              const SizedBox(height: 16),
-              HorizontalList(
-                height: AppSizes.scaled(context, 58),
-                itemCount: app.rooms.length,
-                itemBuilder: (_, i) {
-                  final r = app.rooms[i];
-                  return RoomChip(
-                    room: r,
-                    count: app.countIn(r),
-                    selected: r == room,
-                    // Bấm lại phòng đang chọn → bỏ lọc.
-                    onTap: () => setState(() {
-                      _room = r == room ? null : r;
+              children: [
+                _pad(
+                  SearchBox(
+                    controller: _search,
+                    hint: 'Search Devices',
+                    onChanged: (v) => setState(() {
+                      _query = v;
                       _resetPage();
                     }),
-                  );
-                },
-              ),
-              if (featured.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                _featured(app, featured),
-              ],
-              for (final g in DeviceGroup.values)
-                ..._group(g, [
-                  for (final d in visible)
-                    if (d.group == g) d,
-                ]),
-              if (visible.isEmpty)
-                const EmptyState(
-                  icon: Icons.search_off_rounded,
-                  message: 'No devices found',
+                  ),
                 ),
-            ],
+                const SizedBox(height: 16),
+                HorizontalList(
+                  height: AppSizes.scaled(context, 58),
+                  itemCount: app.rooms.length,
+                  itemBuilder: (_, i) {
+                    final r = app.rooms[i];
+                    return RoomChip(
+                      room: r,
+                      count: app.countIn(r),
+                      selected: r == room,
+                      // Bấm lại phòng đang chọn → bỏ lọc.
+                      onTap: () => setState(() {
+                        _room = r == room ? null : r;
+                        _resetPage();
+                      }),
+                    );
+                  },
+                ),
+                if (featured.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  _featured(app, featured),
+                ],
+                for (final g in DeviceGroup.values)
+                  ..._group(g, [
+                    for (final d in visible)
+                      if (d.group == g) d,
+                  ]),
+                if (visible.isEmpty)
+                  const EmptyState(
+                    icon: Icons.search_off_rounded,
+                    message: 'No devices found',
+                  ),
+              ],
+            ),
           ),
         ),
       ],
@@ -222,42 +227,67 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
-/// Chỉ báo trang: đường mảnh, trang hiện tại là viên tối trượt theo.
+/// Chỉ báo trang kiểu iPhone: chỉ hiện tối đa [_visible] chấm quanh trang
+/// hiện tại (chấm tối). Chấm ở mép nhỏ lại khi còn trang phía bên đó, nên
+/// nhiều thiết bị đến đâu cũng không tràn.
 class _PageDots extends StatelessWidget {
   const _PageDots({required this.count, required this.index});
 
   final int count;
   final int index;
 
+  static const _visible = 5;
+  static const _slot = 16.0; // Mỗi chấm chiếm 1 ô rộng chừng này.
+
   @override
   Widget build(BuildContext context) {
-    const width = 100.0, pill = 28.0;
-    final x = count <= 1 ? 0.0 : index / (count - 1) * (width - pill);
+    final shown = math.min(count, _visible);
+    // Chấm đầu tiên của cửa sổ: giữ trang hiện tại ở giữa nếu được.
+    final start = (index - _visible ~/ 2).clamp(0, count - shown);
     return Semantics(
       label: 'Page ${index + 1} of $count',
       child: SizedBox(
-        width: width,
+        width: shown * _slot,
         height: 8,
-        child: Stack(
-          alignment: Alignment.centerLeft,
-          children: [
-            Container(height: 2, color: AppColors.muted),
-            AnimatedPositioned(
-              duration: AppMotion.medium,
-              curve: AppMotion.curve,
-              left: x,
-              child: Container(
-                width: pill,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: AppColors.dark,
-                  borderRadius: BorderRadius.circular(4),
+        child: ClipRect(
+          child: Stack(
+            children: [
+              for (var i = 0; i < count; i++)
+                AnimatedPositioned(
+                  duration: AppMotion.medium,
+                  curve: AppMotion.curve,
+                  left: (i - start) * _slot,
+                  top: 0,
+                  bottom: 0,
+                  width: _slot,
+                  child: Center(
+                    child: AnimatedContainer(
+                      duration: AppMotion.medium,
+                      curve: AppMotion.curve,
+                      width: _size(i, start, shown),
+                      height: _size(i, start, shown),
+                      decoration: BoxDecoration(
+                        color: i == index ? AppColors.dark : AppColors.muted,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  /// Trang hiện tại 8, chấm mép còn trang phía sau 4, chấm thường 6,
+  /// ngoài cửa sổ 0 (ẩn).
+  double _size(int i, int start, int shown) {
+    if (i == index) return 8;
+    final pos = i - start;
+    if (pos < 0 || pos >= shown) return 0;
+    final moreLeft = pos == 0 && start > 0;
+    final moreRight = pos == shown - 1 && start + shown < count;
+    return moreLeft || moreRight ? 4 : 6;
   }
 }

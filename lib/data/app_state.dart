@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 
 import 'activity_alert.dart';
 import 'device_settings.dart';
+import 'fake_home_api.dart';
+import 'home_api.dart';
 import 'home_device.dart';
 import 'room.dart';
 import 'sample_data.dart';
@@ -15,17 +17,23 @@ import 'user.dart';
 /// - Màn hình đọc qua `AppScope.of(context)` → tự vẽ lại khi dữ liệu đổi,
 ///   không cần truyền dữ liệu qua từng màn.
 /// - Mọi thay đổi đi qua các hàm ở đây (danh sách trả ra chỉ để đọc).
-/// - Hiện lấy từ [SampleData] và chỉ giữ trong bộ nhớ. Khi có API hoặc cần
-///   lưu xuống máy, chỉ cần sửa lớp này.
+/// - Thông báo tải từng trang qua [api] (hiện là [FakeHomeApi]). Thiết bị,
+///   phòng... vẫn lấy từ [SampleData] và chỉ giữ trong bộ nhớ.
 class AppState extends ChangeNotifier {
   AppState({
     List<HomeDevice> devices = SampleData.devices,
     List<Room> rooms = SampleData.rooms,
-    List<ActivityAlert> alerts = SampleData.alerts,
-  }) : devices = UnmodifiableListView(devices),
+    HomeApi? api,
+  }) : api = api ?? FakeHomeApi(),
+       devices = UnmodifiableListView(devices),
        _rooms = [...rooms],
-       _alerts = [...alerts],
-       _on = {for (final d in devices) d: d.on};
+       _on = {for (final d in devices) d: d.on} {
+    // Tải sẵn trang đầu để chuông có số ngay. Lỗi thì tab thông báo tự thử lại.
+    loadMoreAlerts().ignore();
+  }
+
+  /// Nơi lấy dữ liệu (server thật hoặc giả).
+  final HomeApi api;
 
   // ───────────────────────── Hồ sơ & tuỳ chọn ─────────────────────────
 
@@ -182,22 +190,89 @@ class AppState extends ChangeNotifier {
 
   // ───────────────────────── Thông báo ─────────────────────────
 
-  final List<ActivityAlert> _alerts;
+  static const alertPageSize = 10;
+
+  final _alerts = <ActivityAlert>[];
+
+  /// Các thông báo đã tải về (chưa chắc là hết, xem [alertsHasMore]).
   List<ActivityAlert> get alerts => UnmodifiableListView(_alerts);
 
+  /// Tổng số thông báo trên server — số hiện trên chuông.
+  int get alertCount => _alertTotal;
+  var _alertTotal = 0;
+
+  /// Còn trang trên server chưa tải.
+  bool get alertsHasMore => _alertsHasMore;
+  var _alertsHasMore = true;
+
+  var _alertPage = 0; // trang sẽ tải tiếp
+  Future<void>? _alertsLoading;
+
+  /// Tăng mỗi lần làm mới → kết quả của lần tải cũ (về muộn) bị bỏ qua.
+  var _alertsVersion = 0;
+
+  /// Tải trang thông báo tiếp theo. Đang tải dở → dùng lại lần đó,
+  /// không gọi server 2 lần. Lỗi → ném [ApiException].
+  Future<void> loadMoreAlerts() {
+    if (!_alertsHasMore) return Future.value();
+    if (_alertsLoading case final busy?) return busy;
+    late final Future<void> load;
+    load = _fetchAlerts(_alertPage).whenComplete(() {
+      if (identical(_alertsLoading, load)) _alertsLoading = null;
+    });
+    return _alertsLoading = load;
+  }
+
+  /// Tải lại từ trang đầu. Danh sách cũ vẫn hiện cho tới khi có kết quả.
+  Future<void> refreshAlerts() {
+    _alertsVersion++;
+    _alertsLoading = null;
+    return _fetchAlerts(0);
+  }
+
+  Future<void> _fetchAlerts(int page) async {
+    final version = _alertsVersion;
+    final r = await api.fetchAlerts(page: page, size: alertPageSize);
+    if (version != _alertsVersion) return;
+    if (page == 0) _alerts.clear();
+    _alerts.addAll(r.items);
+    _alertPage = page + 1;
+    _alertTotal = r.total;
+    _alertsHasMore = r.hasMore;
+    notifyListeners();
+  }
+
   /// Ẩn [alert]. Trả về vị trí cũ để hoàn tác bằng [restoreAlert].
+  // TODO: báo server khi có API.
   int? dismissAlert(ActivityAlert alert) {
     final i = _alerts.indexOf(alert);
     if (i < 0) return null;
     _alerts.removeAt(i);
+    _alertTotal--;
     notifyListeners();
     return i;
   }
 
   void restoreAlert(int index, ActivityAlert alert) {
     _alerts.insert(index.clamp(0, _alerts.length), alert);
+    _alertTotal++;
     notifyListeners();
   }
+
+  // ───────────────────────── Làm mới ─────────────────────────
+
+  /// Kéo xuống để làm mới. Hiện dữ liệu là mẫu nên chỉ giả chờ.
+  // TODO: tải lại thiết bị, phòng, thông báo từ backend khi có API.
+  Future<void> refresh() async {
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    notifyListeners();
+  }
+
+  /// Danh sách chưa có API (VD: thiết bị) cuộn tới cuối → giả chờ tải
+  /// 1 trang; dữ liệu đã có sẵn trong máy.
+  // TODO: chuyển sang gọi [api] như thông báo khi backend có API thiết bị.
+  Future<void> loadPage() =>
+      Future<void>.delayed(const Duration(milliseconds: 600));
 }
 
 /// Đưa [AppState] tới mọi màn. Đặt trên cùng, bọc cả `MaterialApp`

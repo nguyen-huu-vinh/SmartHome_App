@@ -31,10 +31,14 @@ class AuthLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     // Cao theo đúng tỉ lệ ảnh gốc, không kéo giãn hết màn hình.
-    final heroH = (size.width * AppImages.authHeroRatio).clamp(
-      0.0,
-      size.height * heroMaxFraction,
-    );
+    // Bàn phím đang mở → thu ảnh còn 1 dải mỏng để khối trắng đủ chỗ.
+    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final heroH = keyboardOpen
+        ? MediaQuery.paddingOf(context).top + 8
+        : (size.width * AppImages.authHeroRatio).clamp(
+            0.0,
+            size.height * heroMaxFraction,
+          );
     final card = DecoratedBox(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -65,7 +69,8 @@ class AuthLayout extends StatelessWidget {
         children: [
           // Ảnh phải nằm trong Positioned có chiều cao, nếu không sẽ bị
           // kéo giãn theo cả màn hình và chỉ lộ ra phần tường trắng.
-          Positioned(
+          AnimatedPositioned(
+            duration: AppMotion.fast,
             top: 0,
             left: 0,
             right: 0,
@@ -87,7 +92,14 @@ class AuthLayout extends StatelessWidget {
               ),
             )
           else
-            Positioned.fill(top: heroH, child: card),
+            AnimatedPositioned(
+              duration: AppMotion.fast,
+              top: heroH,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: card,
+            ),
         ],
       ),
     );

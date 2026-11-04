@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => FloatingNavBar(
           current: _tab,
           onTap: _onNav,
-          badges: {NavTab.alerts: AppScope.of(context).alerts.length},
+          badges: {NavTab.alerts: AppScope.of(context).alertCount},
         ),
       ),
       // Giữ nguyên trạng thái từng tab (vị trí cuộn, ô tìm kiếm).

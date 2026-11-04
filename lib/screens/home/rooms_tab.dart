@@ -5,6 +5,7 @@ import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/room.dart';
+import '../../widgets/app_buttons.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/badges.dart';
 import '../../widgets/dashed_box.dart';
@@ -91,27 +92,9 @@ class _RoomsTabState extends State<RoomsTab> {
               : AddTile(label: 'Add Room', onTap: _add, height: tileHeight),
         ),
         const SizedBox(height: 16),
-        DashedBox(
-          onTap: () => setState(() => _editing = !_editing),
-          child: AnimatedSwitcher(
-            duration: AppMotion.fast,
-            child: Row(
-              key: ValueKey(_editing),
-              mainAxisSize: MainAxisSize.min,
-              spacing: 12,
-              children: [
-                Icon(
-                  _editing ? Icons.check_rounded : Icons.edit_rounded,
-                  size: 20,
-                  color: AppColors.dark,
-                ),
-                Text(
-                  _editing ? 'Done' : 'Manage',
-                  style: AppText.body(size: 16),
-                ),
-              ],
-            ),
-          ),
+        PrimaryButton(
+          label: _editing ? 'Done' : 'Manage',
+          onPressed: () => setState(() => _editing = !_editing),
         ),
       ],
     );

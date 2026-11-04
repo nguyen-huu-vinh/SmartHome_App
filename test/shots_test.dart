@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smarthome_app/core/theme.dart';
 import 'package:smarthome_app/data/app_state.dart';
 import 'package:smarthome_app/data/country.dart';
+import 'package:smarthome_app/data/fake_home_api.dart';
 import 'package:smarthome_app/data/home_device.dart';
 import 'package:smarthome_app/data/sample_data.dart';
 import 'package:smarthome_app/screens/auth/login_phone_screen.dart';
@@ -54,7 +55,7 @@ Future<void> _loadFonts() async {
 }
 
 Widget _app(Widget home) => AppScope(
-  state: AppState(),
+  state: AppState(api: FakeHomeApi.instant()),
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: buildAppTheme(),

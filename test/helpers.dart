@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smarthome_app/data/app_state.dart';
+import 'package:smarthome_app/data/fake_home_api.dart';
+import 'package:smarthome_app/data/home_api.dart';
 import 'package:smarthome_app/main.dart';
 
 /// Mở [home] trong app thật (theme, giới hạn cỡ chữ...) với dữ liệu mới,
 /// trên màn hình [size] và cỡ chữ hệ thống [textScale]. Trả về dữ liệu
-/// để kiểm tra / thao tác.
+/// để kiểm tra / thao tác. Mặc định server giả trả ngay 3 thông báo mẫu.
 Future<AppState> pumpApp(
   WidgetTester t,
   Widget home, {
   Size size = const Size(375, 812),
   double textScale = 1,
   bool settle = true,
+  HomeApi? api,
 }) async {
   t.view.physicalSize = size * 3;
   t.view.devicePixelRatio = 3;
   t.platformDispatcher.textScaleFactorTestValue = textScale;
   addTearDown(t.view.reset);
   addTearDown(t.platformDispatcher.clearTextScaleFactorTestValue);
-  final app = AppState();
+  final app = AppState(api: api ?? FakeHomeApi.instant());
   await t.pumpWidget(
     AppScope(
       state: app,

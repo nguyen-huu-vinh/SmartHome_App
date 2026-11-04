@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smarthome_app/core/feedback.dart';
 import 'package:smarthome_app/core/validators.dart';
 import 'package:smarthome_app/data/app_state.dart';
+import 'package:smarthome_app/data/fake_home_api.dart';
 import 'package:smarthome_app/data/home_device.dart';
 import 'package:smarthome_app/data/sample_data.dart';
 import 'package:smarthome_app/data/user.dart';
@@ -10,8 +11,10 @@ void main() {
   late AppState app;
   late int notified;
 
-  setUp(() {
-    app = AppState()..addListener(() => notified++);
+  setUp(() async {
+    app = AppState(api: FakeHomeApi.instant());
+    await app.loadMoreAlerts(); // trang thông báo đầu tiên
+    app.addListener(() => notified++);
     notified = 0;
   });
 

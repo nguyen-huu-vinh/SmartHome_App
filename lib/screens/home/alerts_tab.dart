@@ -52,36 +52,33 @@ class _AlertsTabState extends State<AlertsTab> {
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
     final alerts = app.alerts;
-    return TabPage(
+    return TabPage.paged(
       title: 'Activity Alerts',
-      children: [
-        for (final a in alerts)
-          Padding(
-            key: ObjectKey(a),
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Dismissible(
-              key: ObjectKey(a),
-              onDismissed: (_) => _dismiss(a),
-              background: const _DismissBackground(Alignment.centerLeft),
-              secondaryBackground: const _DismissBackground(
-                Alignment.centerRight,
-              ),
-              child: a.kind == AlertKind.suggestion
-                  ? _suggestion(app, a)
-                  : _DeviceAlertCard(
-                      alert: a,
-                      busy: _connecting.contains(a),
-                      onReconnect: () => _reconnect(a),
-                    ),
-            ),
-          ),
-        if (alerts.isEmpty)
-          const EmptyState(
-            icon: Icons.notifications_none_rounded,
-            message: 'No notifications yet',
-            padding: EdgeInsets.only(top: 80),
-          ),
-      ],
+      itemCount: alerts.length,
+      hasMore: app.alertsHasMore,
+      onLoadMore: app.loadMoreAlerts,
+      onRefresh: app.refreshAlerts,
+      itemBuilder: (_, i) {
+        final a = alerts[i];
+        return Dismissible(
+          key: ObjectKey(a),
+          onDismissed: (_) => _dismiss(a),
+          background: const _DismissBackground(Alignment.centerLeft),
+          secondaryBackground: const _DismissBackground(Alignment.centerRight),
+          child: a.kind == AlertKind.suggestion
+              ? _suggestion(app, a)
+              : _DeviceAlertCard(
+                  alert: a,
+                  busy: _connecting.contains(a),
+                  onReconnect: () => _reconnect(a),
+                ),
+        );
+      },
+      empty: const EmptyState(
+        icon: Icons.notifications_none_rounded,
+        message: 'No notifications yet',
+        padding: EdgeInsets.only(top: 80),
+      ),
     );
   }
 

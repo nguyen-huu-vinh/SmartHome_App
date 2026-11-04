@@ -273,7 +273,7 @@ class MediaCard extends StatelessWidget {
                         duration: AppMotion.fast,
                         style: AppText.body(
                           size: 16,
-                          color: on ? AppColors.brand : AppColors.grey,
+                          color: on ? AppColors.success : AppColors.grey,
                         ),
                         child: Text(
                           on ? 'Power On' : 'Power Off',

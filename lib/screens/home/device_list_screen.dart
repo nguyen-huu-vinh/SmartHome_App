@@ -6,6 +6,7 @@ import '../../data/app_state.dart';
 import '../../data/home_device.dart';
 import '../../widgets/device_cards.dart';
 import '../../widgets/headers.dart';
+import '../../widgets/paged_list.dart';
 
 /// "View all": toàn bộ thiết bị của 1 nhóm, thẻ giãn hết chiều ngang.
 class DeviceListScreen extends StatelessWidget {
@@ -24,7 +25,7 @@ class DeviceListScreen extends StatelessWidget {
             subtitle: plural(items.length, group.unit),
           ),
           Expanded(
-            child: ListView.separated(
+            child: PagedList(
               padding: EdgeInsets.fromLTRB(
                 16,
                 24,
@@ -32,7 +33,6 @@ class DeviceListScreen extends StatelessWidget {
                 MediaQuery.paddingOf(context).bottom + 24,
               ),
               itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 16),
               itemBuilder: (_, i) => SizedBox(
                 height: AppSizes.scaled(context, deviceCardHeight(group)),
                 child: DeviceCard(device: items[i], width: double.infinity),

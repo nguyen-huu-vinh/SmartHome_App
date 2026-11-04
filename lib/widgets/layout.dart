@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../data/app_state.dart';
 
 // Khối bố cục dùng lặp lại: tiêu đề mục, danh sách ngang, trạng thái rỗng,
-// vùng bị khoá.
+// vùng bị khoá, kéo để làm mới.
+
+/// Kéo xuống để làm mới. [child] là danh sách cuộn dọc, nên đặt
+/// `physics: AlwaysScrollableScrollPhysics()` để danh sách ngắn vẫn kéo được.
+/// Mặc định gọi `AppState.refresh`; truyền [onRefresh] để làm thêm việc khác.
+class AppRefresh extends StatelessWidget {
+  const AppRefresh({super.key, required this.child, this.onRefresh});
+
+  final Widget child;
+  final RefreshCallback? onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator.adaptive(
+      color: AppColors.brand,
+      onRefresh: onRefresh ?? AppScope.read(context).refresh,
+      child: child,
+    );
+  }
+}
 
 /// Tiêu đề mục + phần bên phải (VD: "Lights & Decoration ... View all").
 class SectionHeader extends StatelessWidget {

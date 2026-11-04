@@ -68,7 +68,7 @@ class PowerBox extends StatelessWidget {
   }
 }
 
-/// "⏻ ON" nền brand — nút nguồn của thẻ nổi bật ở Home.
+/// "⏻ ON" nền xanh lá — nút nguồn của thẻ nổi bật ở Home.
 class PowerPill extends StatelessWidget {
   const PowerPill({super.key, required this.on, required this.onChanged});
 
@@ -100,7 +100,7 @@ class PowerPill extends StatelessWidget {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: on ? AppColors.brand : AppColors.soft,
+                color: on ? AppColors.switchOn : AppColors.soft,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -119,7 +119,7 @@ class PowerPill extends StatelessWidget {
   }
 }
 
-/// Công tắc gạt nhỏ: bật → nền brand, tắt → nền xám.
+/// Công tắc gạt nhỏ: bật → nền xanh lá, tắt → nền xám.
 class PowerSwitch extends StatelessWidget {
   const PowerSwitch({super.key, required this.on, required this.onChanged});
 
@@ -145,7 +145,7 @@ class PowerSwitch extends StatelessWidget {
           padding: const EdgeInsets.all(3),
           alignment: on ? Alignment.centerRight : Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: on ? AppColors.brand : AppColors.soft,
+            color: on ? AppColors.switchOn : AppColors.soft,
             borderRadius: BorderRadius.circular(12),
           ),
           child: CircleAvatar(

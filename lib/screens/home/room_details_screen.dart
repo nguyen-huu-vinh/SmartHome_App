@@ -95,48 +95,51 @@ class RoomDetailsScreen extends StatelessWidget {
             ],
           ),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.only(
-                top: 24,
-                bottom: MediaQuery.paddingOf(context).bottom + 24,
-              ),
-              children: [
-                if (lights.isNotEmpty) ...[
-                  HorizontalList(
-                    height: AppSizes.scaled(
-                      context,
-                      deviceCardHeight(DeviceGroup.lights),
-                    ),
-                    itemCount: lights.length,
-                    itemBuilder: (_, i) => LightCard(
-                      device: lights[i],
-                      on: app.isOn(lights[i]),
-                      onChanged: (v) => app.setOn(lights[i], v),
-                      width: 220,
-                      onTap: () => showDeviceSheet(context, lights[i]),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                _pad(_Masonry(devices: others)),
-                for (final d in cleaners) ...[
-                  _pad(_CleanerTile(device: d)),
-                  const SizedBox(height: 16),
-                ],
-                if (devices.isEmpty)
-                  const EmptyState(
-                    icon: Icons.devices_other_rounded,
-                    message: 'No devices in this room yet',
-                    padding: EdgeInsets.fromLTRB(32, 32, 32, 24),
-                  ),
-                _pad(
-                  AddTile(
-                    label: 'Add New Device',
-                    onTap: () => _addDevice(context),
-                    height: 56,
-                  ),
+            child: AppRefresh(
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  top: 24,
+                  bottom: MediaQuery.paddingOf(context).bottom + 24,
                 ),
-              ],
+                children: [
+                  if (lights.isNotEmpty) ...[
+                    HorizontalList(
+                      height: AppSizes.scaled(
+                        context,
+                        deviceCardHeight(DeviceGroup.lights),
+                      ),
+                      itemCount: lights.length,
+                      itemBuilder: (_, i) => LightCard(
+                        device: lights[i],
+                        on: app.isOn(lights[i]),
+                        onChanged: (v) => app.setOn(lights[i], v),
+                        width: 220,
+                        onTap: () => showDeviceSheet(context, lights[i]),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  _pad(_Masonry(devices: others)),
+                  for (final d in cleaners) ...[
+                    _pad(_CleanerTile(device: d)),
+                    const SizedBox(height: 16),
+                  ],
+                  if (devices.isEmpty)
+                    const EmptyState(
+                      icon: Icons.devices_other_rounded,
+                      message: 'No devices in this room yet',
+                      padding: EdgeInsets.fromLTRB(32, 32, 32, 24),
+                    ),
+                  _pad(
+                    AddTile(
+                      label: 'Add New Device',
+                      onTap: () => _addDevice(context),
+                      height: 56,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

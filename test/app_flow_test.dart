@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smarthome_app/data/fake_home_api.dart';
 import 'package:smarthome_app/data/home_device.dart';
 import 'package:smarthome_app/data/sample_data.dart';
 import 'package:smarthome_app/screens/auth/login_screen.dart';
@@ -13,6 +15,7 @@ import 'package:smarthome_app/screens/setup/manage_rooms_screen.dart';
 import 'package:smarthome_app/widgets/app_buttons.dart';
 import 'package:smarthome_app/widgets/badges.dart';
 import 'package:smarthome_app/widgets/device_controls.dart';
+import 'package:smarthome_app/widgets/paged_list.dart';
 
 import 'helpers.dart';
 
@@ -114,6 +117,130 @@ void main() {
     expect(app.profile.name, 'Lan Anh');
     expect(find.text('Lan Anh'), findsOneWidget);
     expect(find.text('Profile updated'), findsOneWidget);
+  });
+
+  testWidgets(
+    'kéo xuống để làm mới: Home và tab thông báo (danh sách ngắn)',
+    (t) async {
+      final spinner = find.byWidgetPredicate(
+        (w) => w is RefreshProgressIndicator || w is CupertinoActivityIndicator,
+      );
+      Future<void> pull() async {
+        await t.fling(find.byType(ListView).first, const Offset(0, 400), 1000);
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 300));
+        expect(spinner, findsOneWidget);
+        await t.pumpAndSettle();
+        expect(spinner, findsNothing);
+      }
+
+      await pumpApp(t, const HomeScreen());
+      await pull();
+      await tapNav(t, 'Notifications');
+      await pull();
+    },
+    variant: const TargetPlatformVariant({
+      TargetPlatform.android,
+      TargetPlatform.iOS,
+    }),
+  );
+
+  testWidgets('phân trang: cuộn tới cuối tải thêm, kéo làm mới về trang đầu', (
+    t,
+  ) async {
+    await pumpApp(
+      t,
+      Scaffold(
+        body: PagedList(
+          itemCount: 25,
+          pageSize: 10,
+          itemBuilder: (_, i) => SizedBox(height: 100, child: Text('Item $i')),
+        ),
+      ),
+    );
+    final more = find.bySemanticsLabel('Loading more');
+    expect(find.text('Item 0'), findsOneWidget);
+
+    // Trang 1: 0..9. Cuộn xuống cuối → vòng xoay → thêm 10..19.
+    Future<void> scrollToEnd() async {
+      await t.drag(find.byType(ListView), const Offset(0, -3000));
+      await t.pump();
+    }
+
+    await scrollToEnd();
+    expect(find.text('Item 9'), findsOneWidget);
+    expect(find.text('Item 10'), findsNothing);
+    expect(more, findsOneWidget);
+    await t.pump(const Duration(milliseconds: 700));
+    await scrollToEnd();
+    expect(find.text('Item 19'), findsOneWidget);
+    await t.pump(const Duration(milliseconds: 700));
+    await scrollToEnd();
+    await t.pumpAndSettle();
+    expect(find.text('Item 24'), findsOneWidget);
+    expect(more, findsNothing, reason: 'hết dữ liệu thì không tải nữa');
+
+    // Lên đầu, kéo làm mới → chỉ còn trang đầu.
+    await t.drag(find.byType(ListView), const Offset(0, 5000));
+    await t.pumpAndSettle();
+    await t.fling(find.byType(ListView), const Offset(0, 400), 1000);
+    await t.pumpAndSettle();
+    // Cuộn nhẹ để ListView tính lại chiều dài danh sách đã ngắn đi.
+    await t.drag(find.byType(ListView), const Offset(0, -50));
+    await t.pumpAndSettle();
+    await scrollToEnd();
+    expect(find.text('Item 9'), findsOneWidget);
+    expect(find.text('Item 10'), findsNothing);
+    await unmount(t); // đang tải trang 2 → gỡ màn cho hết hẹn giờ
+  });
+
+  testWidgets('thông báo tải từng trang từ server giả', (t) async {
+    final app = await pumpApp(
+      t,
+      const HomeScreen(),
+      api: FakeHomeApi(
+        alerts: FakeHomeApi.manyAlerts(25),
+        delay: Duration.zero,
+        failRate: 0,
+      ),
+    );
+    expect(app.alerts, hasLength(10), reason: 'mới tải trang đầu');
+    expect(app.alertCount, 25, reason: 'chuông tính tổng số trên server');
+    expect(find.text('9+'), findsOneWidget);
+
+    await tapNav(t, 'Notifications');
+    for (var i = 0; i < 6 && app.alertsHasMore; i++) {
+      await t.drag(find.byType(ListView), const Offset(0, -3000));
+      await t.pumpAndSettle();
+    }
+    expect(app.alerts, hasLength(25));
+    expect(app.alertsHasMore, isFalse);
+
+    // Kéo làm mới → về lại trang đầu.
+    await app.refreshAlerts();
+    expect(app.alerts, hasLength(10));
+  });
+
+  testWidgets('mất mạng khi tải thêm → bấm Retry tải lại được', (t) async {
+    final api = FakeHomeApi(
+      alerts: FakeHomeApi.manyAlerts(25),
+      delay: Duration.zero,
+      failRate: 0,
+    );
+    final app = await pumpApp(t, const HomeScreen(), api: api);
+    await tapNav(t, 'Notifications');
+
+    api.failRate = 1; // từ giờ mọi lần gọi đều lỗi
+    await t.drag(find.byType(ListView), const Offset(0, -3000));
+    await t.pumpAndSettle();
+    expect(find.text('Retry'), findsOneWidget);
+    expect(app.alerts, hasLength(10));
+
+    api.failRate = 0; // có mạng lại
+    await t.tap(find.text('Retry'));
+    await t.pumpAndSettle();
+    expect(app.alerts, hasLength(20));
+    expect(find.text('Retry'), findsNothing);
   });
 
   testWidgets('tìm không thấy → bấm Home để về trạng thái ban đầu', (t) async {

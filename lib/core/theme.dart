@@ -34,6 +34,7 @@ abstract final class AppColors {
   static const amber = Color(0xFFF5A623); // sao, tia sét, độ sáng
   static const idle = Color(0xFF85878F); // icon chưa chọn
   static const knob = Color(0xFF4A4C55); // núm công tắc khi tắt
+  static const switchOn = Color(0xFF34C759); // nền công tắc khi bật (xanh lá)
 }
 
 /// Kích thước theo thiết kế (Figma).
@@ -220,8 +221,9 @@ ThemeData buildAppTheme() {
         (s) => s.contains(WidgetState.selected) ? Colors.white : AppColors.knob,
       ),
       trackColor: WidgetStateProperty.resolveWith(
-        (s) =>
-            s.contains(WidgetState.selected) ? AppColors.brand : AppColors.line,
+        (s) => s.contains(WidgetState.selected)
+            ? AppColors.switchOn
+            : AppColors.line,
       ),
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
     ),
