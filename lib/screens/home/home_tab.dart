@@ -22,8 +22,7 @@ import 'device_list_screen.dart';
 /// Nhãn gắn vào các chỗ ở tab Home mà phần giới thiệu app làm sáng.
 class HomeTourKeys {
   final home = GlobalKey(debugLabel: 'tour: home');
-  final search = GlobalKey(debugLabel: 'tour: search');
-  final rooms = GlobalKey(debugLabel: 'tour: rooms');
+  final homeLabel = GlobalKey(debugLabel: 'tour: home label');
   final featured = GlobalKey(debugLabel: 'tour: featured');
 }
 
@@ -118,6 +117,7 @@ class _HomeTabState extends State<HomeTab> {
           index: app.homeIndex,
           onTap: _manageHomes,
           nameKey: tour?.home,
+          labelKey: tour?.homeLabel,
         ),
         Expanded(
           child: AppRefresh(
@@ -132,7 +132,6 @@ class _HomeTabState extends State<HomeTab> {
               children: [
                 _pad(
                   SearchBox(
-                    key: tour?.search,
                     controller: _search,
                     hint: context.l10n.searchDevices,
                     onChanged: (v) => setState(() {
@@ -143,7 +142,6 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 const SizedBox(height: 16),
                 HorizontalList(
-                  key: tour?.rooms,
                   height: AppSizes.scaled(context, 58),
                   itemCount: app.rooms.length,
                   itemBuilder: (_, i) {

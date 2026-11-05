@@ -633,20 +633,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chạm vào tên nhà để chuyển sang nhà khác hoặc thêm nhà mới. Mọi thứ trong app đổi theo nhà bạn chọn.';
 
   @override
-  String get tourSearchTitle => 'Tìm thiết bị';
-
-  @override
-  String get tourSearchMessage =>
-      'Gõ tên để tìm nhanh bất kỳ thiết bị nào trong nhà.';
-
-  @override
-  String get tourRoomsTitle => 'Lọc theo phòng';
-
-  @override
-  String get tourRoomsMessage =>
-      'Chạm vào một phòng để chỉ hiện thiết bị của phòng đó. Chạm lần nữa để xem tất cả.';
-
-  @override
   String get tourFeaturedTitle => 'Điều khiển nhanh';
 
   @override

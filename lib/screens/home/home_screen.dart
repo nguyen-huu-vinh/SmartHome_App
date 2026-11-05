@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/routes.dart';
-import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../l10n/l10n.dart';
 import '../../widgets/app_tour.dart';
@@ -64,22 +63,12 @@ class _HomeScreenState extends State<HomeScreen> {
       TourStep(
         target: _tourKeys.home,
         icon: Icons.home_rounded,
-        radius: 999,
+        // Ôm cả khối chọn nhà: dòng "Welcome Back" + tên nhà.
+        also: [_tourKeys.homeLabel],
+        radius: 20,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         title: l.tourHomeTitle,
         message: l.tourHomeMessage,
-      ),
-      TourStep(
-        target: _tourKeys.search,
-        icon: Icons.search_rounded,
-        title: l.tourSearchTitle,
-        message: l.tourSearchMessage,
-      ),
-      TourStep(
-        target: _tourKeys.rooms,
-        icon: Icons.meeting_room_rounded,
-        radius: AppSizes.radiusS,
-        title: l.tourRoomsTitle,
-        message: l.tourRoomsMessage,
       ),
       TourStep(
         target: _tourKeys.featured,

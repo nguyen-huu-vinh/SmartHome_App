@@ -16,6 +16,7 @@ class HomeSwitcherHeader extends StatelessWidget {
     this.onChanged,
     this.onTap,
     this.nameKey,
+    this.labelKey,
   });
 
   final List<String> homes;
@@ -25,6 +26,9 @@ class HomeSwitcherHeader extends StatelessWidget {
 
   /// Nhãn gắn vào tên nhà (để phần giới thiệu app tìm ra vị trí).
   final GlobalKey? nameKey;
+
+  /// Nhãn gắn vào dòng "Welcome Back" (phần giới thiệu app làm sáng chung).
+  final GlobalKey? labelKey;
 
   Widget _name() => Row(
     mainAxisSize: MainAxisSize.min,
@@ -48,7 +52,7 @@ class HomeSwitcherHeader extends StatelessWidget {
       child: Column(
         spacing: 4,
         children: [
-          Text(context.l10n.welcomeBack, style: AppText.body()),
+          Text(context.l10n.welcomeBack, key: labelKey, style: AppText.body()),
           if (onTap != null)
             Pressable(
               key: nameKey,

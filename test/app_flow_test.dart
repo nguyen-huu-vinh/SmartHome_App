@@ -336,7 +336,7 @@ void main() {
     expect(find.byType(AddingDeviceScreen), findsNothing);
   });
 
-  testWidgets('lần đầu vào app → giới thiệu 6 bước, xem xong thì nhớ', (
+  testWidgets('lần đầu vào app → giới thiệu 4 bước, xem xong thì nhớ', (
     t,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -344,9 +344,9 @@ void main() {
     await t.pump(const Duration(seconds: 1)); // chờ màn hiện xong
     await t.pumpAndSettle();
     expect(find.text('Your home'), findsOneWidget);
-    expect(find.text('1/6'), findsOneWidget);
+    expect(find.text('1/4'), findsOneWidget);
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 3; i++) {
       await t.tap(find.text('Next'));
       await t.pumpAndSettle();
     }
@@ -366,7 +366,6 @@ void main() {
     await t.pump(const Duration(seconds: 1));
     await t.pumpAndSettle();
     expect(find.text('Your home'), findsOneWidget);
-    expect(find.text('Search Devices'), findsOneWidget, reason: 'về tab Home');
 
     await t.tap(find.text('Skip'));
     await t.pumpAndSettle();

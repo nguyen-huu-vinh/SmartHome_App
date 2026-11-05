@@ -636,20 +636,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap the home name to switch homes or add a new one. Everything in the app follows the home you pick.';
 
   @override
-  String get tourSearchTitle => 'Find a device';
-
-  @override
-  String get tourSearchMessage =>
-      'Type a name to quickly find any device in this home.';
-
-  @override
-  String get tourRoomsTitle => 'Filter by room';
-
-  @override
-  String get tourRoomsMessage =>
-      'Tap a room to show only its devices. Tap it again to see everything.';
-
-  @override
   String get tourFeaturedTitle => 'Quick controls';
 
   @override

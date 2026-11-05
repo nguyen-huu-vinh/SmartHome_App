@@ -1172,30 +1172,6 @@ abstract class AppLocalizations {
   /// **'Tap the home name to switch homes or add a new one. Everything in the app follows the home you pick.'**
   String get tourHomeMessage;
 
-  /// No description provided for @tourSearchTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Find a device'**
-  String get tourSearchTitle;
-
-  /// No description provided for @tourSearchMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Type a name to quickly find any device in this home.'**
-  String get tourSearchMessage;
-
-  /// No description provided for @tourRoomsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Filter by room'**
-  String get tourRoomsTitle;
-
-  /// No description provided for @tourRoomsMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap a room to show only its devices. Tap it again to see everything.'**
-  String get tourRoomsMessage;
-
   /// No description provided for @tourFeaturedTitle.
   ///
   /// In en, this message translates to:
