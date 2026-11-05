@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'app_buttons.dart';
 import 'app_icons.dart';
 import 'app_sheet.dart';
@@ -9,16 +10,16 @@ import 'app_text_field.dart';
 /// Bảng nhập tên phòng mới.
 Future<String?> showAddRoomSheet(BuildContext context) => showNameInputSheet(
   context,
-  title: 'Add Room',
-  hint: 'Room Name',
+  title: context.l10n.addRoom,
+  hint: context.l10n.roomName,
   icon: const CubeIcon(),
 );
 
 /// Bảng nhập tên nhà mới.
 Future<String?> showAddHomeSheet(BuildContext context) => showNameInputSheet(
   context,
-  title: 'Add Home',
-  hint: 'Home Name',
+  title: context.l10n.addHome,
+  hint: context.l10n.homeName,
   icon: const HomeWifiIcon(
     size: 22,
     color: AppColors.brand,

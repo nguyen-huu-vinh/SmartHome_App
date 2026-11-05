@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/assets.dart';
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'app_image.dart';
 import 'pressable.dart';
 
@@ -111,7 +112,7 @@ class AuthHeader extends StatelessWidget {
   const AuthHeader({
     super.key,
     required this.title,
-    this.subtitle = 'Welcome to Hoome’s world of digital technology.',
+    this.subtitle,
     this.subtitleExtra = const [],
     this.titleExtra = const [],
   });
@@ -120,7 +121,9 @@ class AuthHeader extends StatelessWidget {
 
   /// Phần nối thêm sau [title] (vd: tên loại thiết bị tô màu brand).
   final List<InlineSpan> titleExtra;
-  final String subtitle;
+
+  /// null → lời chào mặc định.
+  final String? subtitle;
 
   /// Phần nối thêm sau [subtitle] (vd: email được tô đậm).
   final List<InlineSpan> subtitleExtra;
@@ -138,7 +141,7 @@ class AuthHeader extends StatelessWidget {
         const SizedBox(height: 8),
         Text.rich(
           TextSpan(
-            text: subtitle,
+            text: subtitle ?? context.l10n.authWelcome,
             style: AppText.subtitle,
             children: subtitleExtra,
           ),

@@ -4,6 +4,7 @@ import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/device.dart';
 import '../../data/device_category.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_image.dart';
@@ -60,34 +61,34 @@ class _AddModelsScreenState extends State<AddModelsScreen> {
         if (d.name.toLowerCase().contains(q)) d,
     ];
     return LargeTitlePage(
-      title: 'Add ',
+      title: context.l10n.addTitle,
       titleExtra: [
         TextSpan(
           text: name,
           style: const TextStyle(color: AppColors.brand),
         ),
       ],
-      subtitle:
-          'Pick one or more models below. Keep your device close by to pair '
-          'it quickly.',
+      subtitle: context.l10n.pickModels,
       bottom: Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
         children: [
           PrimaryButton(
-            label: _picked.length > 1 ? 'Add (${_picked.length})' : 'Add',
+            label: _picked.length > 1
+                ? context.l10n.addCount(_picked.length)
+                : context.l10n.add,
             onPressed: _picked.isEmpty ? null : _add,
           ),
           AuthFooter(
-            text: 'Missed a device? ',
-            link: 'Scan nearby devices',
+            text: context.l10n.missedDevice,
+            link: context.l10n.scanNearby,
             onTap: _scanNearby,
           ),
         ],
       ),
       children: [
         SearchBox(
-          hint: 'Search $name',
+          hint: context.l10n.searchNamed(name),
           onChanged: (v) => setState(() => _query = v),
         ),
         const SizedBox(height: 20),
@@ -97,8 +98,8 @@ class _AddModelsScreenState extends State<AddModelsScreen> {
                 ? Icons.inventory_2_outlined
                 : Icons.search_off_rounded,
             message: widget.category.models.isEmpty
-                ? 'No $name models available yet.'
-                : 'No models match “${_query.trim()}”',
+                ? context.l10n.noModelsYet(name)
+                : context.l10n.noModelsMatch(_query.trim()),
           )
         else
           GridView.builder(

@@ -7,6 +7,7 @@ import '../../core/theme.dart';
 import '../../core/validators.dart';
 import '../../data/app_state.dart';
 import '../../data/auth_service.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/auth_layout.dart';
@@ -48,12 +49,12 @@ class _LoginScreenState extends State<LoginScreen> {
       final token = await signInWithGoogle();
       if (!mounted) return;
       if (token == null) {
-        context.toast('Google sign-in failed');
+        context.toast(context.l10n.googleSignInFailed);
         return;
       }
       Navigator.push(context, riseRoute(const ManageHomesScreen()));
     } catch (_) {
-      if (mounted) context.toast('Google sign-in failed');
+      if (mounted) context.toast(context.l10n.googleSignInFailed);
     }
   }
 
@@ -61,8 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _email.text.trim();
     context.toast(
       isValidEmail(email)
-          ? 'Password reset link sent to $email'
-          : 'Enter your email above to reset your password',
+          ? context.l10n.resetLinkSent(email)
+          : context.l10n.enterEmailToReset,
     );
   }
 
@@ -72,11 +73,11 @@ class _LoginScreenState extends State<LoginScreen> {
       // Ảnh thấp hơn chút để màn 812px thấy đủ tới dòng "Create Account".
       heroMaxFraction: 0.36,
       children: [
-        const AuthHeader(title: 'Welcome Back'),
+        AuthHeader(title: context.l10n.welcomeBack),
         const SizedBox(height: 24),
         AppTextField(
           controller: _email,
-          hint: 'Email',
+          hint: context.l10n.email,
           prefix: AppIcon.email.widget(20),
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
@@ -85,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 16),
         AppTextField(
           controller: _password,
-          hint: 'Password',
+          hint: context.l10n.password,
           prefix: AppIcon.lock.widget(20),
           password: true,
           textInputAction: TextInputAction.done,
@@ -96,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 4),
         LinkButton(
-          label: 'Forgot Password?',
+          label: context.l10n.forgotPassword,
           style: AppText.link(color: AppColors.grey),
           onTap: _forgotPassword,
         ),
@@ -104,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ListenableBuilder(
           listenable: _anyChange,
           builder: (_, _) => PrimaryButton(
-            label: 'Continue',
+            label: context.l10n.continueLabel,
             onPressed: _valid ? _continue : null,
           ),
         ),
@@ -114,18 +115,17 @@ class _LoginScreenState extends State<LoginScreen> {
         SocialRow(
           children: [
             SocialButton(
-              tooltip: 'Continue with Apple',
+              tooltip: context.l10n.continueWithApple,
               icon: const Icon(Icons.apple, size: 28),
-              onPressed: () =>
-                  context.toast('Sign in with Apple is coming soon'),
+              onPressed: () => context.toast(context.l10n.signInAppleSoon),
             ),
             SocialButton(
-              tooltip: 'Continue with Google',
+              tooltip: context.l10n.continueWithGoogle,
               icon: AppIcon.google.widget(28),
               onPressed: _googleSignIn,
             ),
             SocialButton(
-              tooltip: 'Continue with phone number',
+              tooltip: context.l10n.continueWithPhone,
               icon: AppIcon.phone.widget(28),
               onPressed: () =>
                   Navigator.push(context, riseRoute(const LoginPhoneScreen())),
@@ -134,8 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 24),
         AuthFooter(
-          text: 'Don’t have an account? ',
-          link: 'Create Account',
+          text: context.l10n.noAccount,
+          link: context.l10n.createAccount,
           onTap: () => Navigator.push(context, riseRoute(const SignupScreen())),
         ),
       ],

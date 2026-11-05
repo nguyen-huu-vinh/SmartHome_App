@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
 import '../data/country.dart';
+import '../l10n/l10n.dart';
 import 'app_sheet.dart';
 import 'pressable.dart';
 
@@ -28,7 +29,7 @@ class _CountrySheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SheetHeader(title: 'Select Country Code'),
+            SheetHeader(title: context.l10n.selectCountryCode),
             const SizedBox(height: 12),
             Container(
               height: 56,

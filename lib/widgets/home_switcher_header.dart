@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'headers.dart';
 import 'pressable.dart';
 
@@ -14,12 +15,16 @@ class HomeSwitcherHeader extends StatelessWidget {
     required this.index,
     this.onChanged,
     this.onTap,
+    this.nameKey,
   });
 
   final List<String> homes;
   final int index;
   final ValueChanged<int>? onChanged;
   final VoidCallback? onTap;
+
+  /// Nhãn gắn vào tên nhà (để phần giới thiệu app tìm ra vị trí).
+  final GlobalKey? nameKey;
 
   Widget _name() => Row(
     mainAxisSize: MainAxisSize.min,
@@ -43,17 +48,19 @@ class HomeSwitcherHeader extends StatelessWidget {
       child: Column(
         spacing: 4,
         children: [
-          Text('Welcome Back', style: AppText.body()),
+          Text(context.l10n.welcomeBack, style: AppText.body()),
           if (onTap != null)
             Pressable(
+              key: nameKey,
               onTap: onTap,
               ripple: false,
-              semanticLabel: 'Change home',
+              semanticLabel: context.l10n.changeHome,
               child: _name(),
             )
           else
             PopupMenuButton<int>(
-              tooltip: 'Change home',
+              key: nameKey,
+              tooltip: context.l10n.changeHome,
               initialValue: index,
               onSelected: onChanged,
               position: PopupMenuPosition.under,

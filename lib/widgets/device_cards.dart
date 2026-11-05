@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../data/app_state.dart';
 import '../data/home_device.dart';
+import '../l10n/l10n.dart';
 import 'app_card.dart';
 import 'app_image.dart';
 import 'badges.dart';
@@ -45,7 +46,7 @@ class DeviceCard extends StatelessWidget {
         on: on,
         onChanged: onChanged,
         width: width ?? 195,
-        status: room ?? 'Connected',
+        status: room ?? context.l10n.connected,
         onTap: open,
       ),
       DeviceGroup.security => CameraCard(
@@ -63,7 +64,7 @@ class DeviceCard extends StatelessWidget {
         on: on,
         onChanged: onChanged,
         width: width ?? 262,
-        status: room ?? 'Connected',
+        status: room ?? context.l10n.connected,
         onTap: open,
       ),
     };
@@ -98,7 +99,7 @@ class FeaturedCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const StatusDot('Connected'),
+                StatusDot(context.l10n.connected),
                 const SizedBox(height: 8),
                 Text(
                   device.name,
@@ -126,7 +127,7 @@ class LightCard extends StatelessWidget {
     required this.on,
     required this.onChanged,
     this.width = 195,
-    this.status = 'Connected',
+    this.status,
     this.onTap,
   });
 
@@ -134,7 +135,9 @@ class LightCard extends StatelessWidget {
   final bool on;
   final ValueChanged<bool> onChanged;
   final double width;
-  final String status;
+
+  /// null → "Connected".
+  final String? status;
   final VoidCallback? onTap;
 
   @override
@@ -170,7 +173,7 @@ class LightCard extends StatelessWidget {
             style: AppText.name,
           ),
           const SizedBox(height: 4),
-          StatusDot(status),
+          StatusDot(status ?? context.l10n.connected),
         ],
       ),
     );
@@ -214,7 +217,10 @@ class CameraCard extends StatelessWidget {
             style: AppText.name,
           ),
           const SizedBox(height: 4),
-          StatusDot(on ? room ?? 'Online' : 'Offline', active: on),
+          StatusDot(
+            on ? room ?? context.l10n.online : context.l10n.offline,
+            active: on,
+          ),
         ],
       ),
     );
@@ -230,7 +236,7 @@ class MediaCard extends StatelessWidget {
     required this.on,
     required this.onChanged,
     this.width = 262,
-    this.status = 'Connected',
+    this.status,
     this.onTap,
   });
 
@@ -238,7 +244,9 @@ class MediaCard extends StatelessWidget {
   final bool on;
   final ValueChanged<bool> onChanged;
   final double width;
-  final String status;
+
+  /// null → "Connected".
+  final String? status;
   final VoidCallback? onTap;
 
   @override
@@ -264,7 +272,7 @@ class MediaCard extends StatelessWidget {
                   style: AppText.name,
                 ),
                 const SizedBox(height: 4),
-                StatusDot(status),
+                StatusDot(status ?? context.l10n.connected),
                 const SizedBox(height: 6),
                 Row(
                   children: [
@@ -276,7 +284,7 @@ class MediaCard extends StatelessWidget {
                           color: on ? AppColors.success : AppColors.grey,
                         ),
                         child: Text(
-                          on ? 'Power On' : 'Power Off',
+                          on ? context.l10n.powerOn : context.l10n.powerOff,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

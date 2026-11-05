@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
 import 'theme.dart';
-
-/// "1 Device", "3 Devices".
-String plural(int count, String noun) =>
-    '$count ${count == 1 ? noun : '${noun}s'}';
 
 /// Phản hồi ngắn cho người dùng: thông báo nổi, hộp thoại xác nhận.
 extension AppFeedback on BuildContext {
@@ -41,7 +38,7 @@ extension AppFeedback on BuildContext {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(c, true),

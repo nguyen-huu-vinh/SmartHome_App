@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../data/app_state.dart';
 import '../data/room.dart';
+import '../l10n/l10n.dart';
 import 'app_buttons.dart';
 import 'app_sheet.dart';
 import 'dashed_box.dart';
@@ -69,7 +70,7 @@ class _ManageRoomSheetState extends State<_ManageRoomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SheetHeader(title: 'Manage Room'),
+            SheetHeader(title: context.l10n.manageRoom),
             const SizedBox(height: 12),
             HorizontalList(
               controller: _scroll,
@@ -86,12 +87,12 @@ class _ManageRoomSheetState extends State<_ManageRoomSheet> {
             ),
             const SizedBox(height: 24),
             AddTile(
-              label: 'Add New Device',
+              label: context.l10n.addNewDevice,
               onTap: () => widget.onAddDevice(_room),
             ),
             const SizedBox(height: 24),
             PrimaryButton(
-              label: 'Continue',
+              label: context.l10n.continueLabel,
               onPressed: () => Navigator.pop(context, _room),
             ),
           ],

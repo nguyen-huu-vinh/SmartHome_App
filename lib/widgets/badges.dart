@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
 import '../data/room.dart';
+import '../l10n/l10n.dart';
 import 'pressable.dart';
 
 // Các nhãn / huy hiệu nhỏ dùng lặp lại ở nhiều màn.
@@ -77,7 +78,9 @@ class BatteryBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Battery $level%${charging ? ', charging' : ''}',
+      label: charging
+          ? context.l10n.batteryCharging(level)
+          : context.l10n.batteryLevel(level),
       child: ExcludeSemantics(
         child: Row(
           mainAxisSize: MainAxisSize.min,

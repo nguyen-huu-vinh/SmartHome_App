@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 
 /// Mở bảng trượt từ dưới lên theo kiểu chung của app (nền trắng, bo góc trên
 /// — xem `bottomSheetTheme`). Bảng cao tự cuộn, không đè lên thanh trạng thái.
@@ -61,7 +62,7 @@ class SheetHeader extends StatelessWidget {
           ),
         ),
         IconButton(
-          tooltip: 'Close',
+          tooltip: context.l10n.close,
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close, color: AppColors.dark),
         ),

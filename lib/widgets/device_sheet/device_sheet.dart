@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../core/feedback.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/device_settings.dart';
 import '../../data/home_device.dart';
+import '../../l10n/l10n.dart';
 import '../app_image.dart';
 import '../app_sheet.dart';
 import '../badges.dart';
@@ -85,7 +85,7 @@ class _DeviceSheetState extends State<DeviceSheet> {
           children: [
             SheetHeader(
               title: widget.device.name,
-              subtitle: plural(units.length, 'Device'),
+              subtitle: context.l10n.devicesCount(units.length),
               // Camera: ảnh thiết bị nhỏ cạnh tên.
               leading: _camera
                   ? AppImage(widget.device.image, width: 48, height: 48)
@@ -155,7 +155,7 @@ class _DeviceSheetState extends State<DeviceSheet> {
           icon: Icons.wb_sunny_outlined,
           iconColor: AppColors.amber,
           dial: ValueDial(
-            label: 'Brightness',
+            label: context.l10n.brightness,
             value: light.brightness,
             min: LightSettings.minBrightness,
             max: LightSettings.maxBrightness,
@@ -171,7 +171,7 @@ class _DeviceSheetState extends State<DeviceSheet> {
           icon: Icons.rotate_left_rounded,
           iconColor: AppColors.dark,
           dial: ValueDial(
-            label: 'Camera angle',
+            label: context.l10n.cameraAngle,
             value: cam.pan,
             min: 0,
             max: CameraSettings.maxPan,
@@ -186,7 +186,7 @@ class _DeviceSheetState extends State<DeviceSheet> {
           icon: ac.mode.icon,
           iconColor: AppColors.brand,
           dial: ValueDial(
-            label: 'Temperature',
+            label: context.l10n.temperature,
             value: ac.temp,
             min: AcSettings.minTemp,
             max: AcSettings.maxTemp,
@@ -202,8 +202,11 @@ class _DeviceSheetState extends State<DeviceSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8,
           children: [
-            StatusDot(on ? 'Powered On' : 'Powered Off', active: on),
-            IconLabel(text: '${_unit.volts}V - Today'),
+            StatusDot(
+              on ? context.l10n.poweredOn : context.l10n.poweredOff,
+              active: on,
+            ),
+            IconLabel(text: context.l10n.voltsToday(_unit.volts)),
           ],
         );
     }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Chạy trước mọi file test: nạp font thật của app (assets/fonts) để chữ đo
 /// đúng kích thước như trên máy thật → kiểm tra tràn bố cục mới đáng tin.
@@ -23,5 +24,8 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
       family,
     )..addFont(Future.value(ByteData.sublistView(bytes)))).load();
   }
+  // Mỗi test bắt đầu với "sổ" trống, coi như đã xem phần giới thiệu app
+  // (để lớp phủ không che màn). Test giới thiệu app tự đặt lại.
+  setUp(() => SharedPreferences.setMockInitialValues({'tour_done': true}));
   await testMain();
 }

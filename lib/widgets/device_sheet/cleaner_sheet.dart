@@ -8,6 +8,7 @@ import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/device_settings.dart';
 import '../../data/home_device.dart';
+import '../../l10n/l10n.dart';
 import '../app_image.dart';
 import '../app_sheet.dart';
 import '../badges.dart';
@@ -40,7 +41,7 @@ class CleanerSheet extends StatelessWidget {
               status: Row(
                 spacing: 8,
                 children: [
-                  const Flexible(child: StatusDot('Connected')),
+                  Flexible(child: StatusDot(context.l10n.connected)),
                   BatteryBadge(level: s.battery, charging: s.charging),
                 ],
               ),
@@ -134,19 +135,19 @@ class _BreakRow extends StatelessWidget {
             size: 28,
             color: AppColors.dark,
           ),
-          fit('Break', 20, box.maxWidth * 0.25),
+          fit(context.l10n.breakShort, 20, box.maxWidth * 0.25),
           Expanded(
             child: ValueDial(
-              label: 'Break between rounds',
+              label: context.l10n.breakBetweenRounds,
               value: seconds,
               min: CleanerSettings.minBreak,
               max: CleanerSettings.maxBreak,
-              format: (v) => '$v seconds',
+              format: (v) => context.l10n.secondsLong(v),
               stepPx: 6, // 6px kéo = 1 giây
               onStep: onStep,
             ),
           ),
-          fit('$seconds Sec', 18, box.maxWidth * 0.25),
+          fit(context.l10n.secondsShort(seconds), 18, box.maxWidth * 0.25),
         ],
       ),
     );
@@ -191,10 +192,10 @@ class _TimerDial extends StatelessWidget {
     final ring = size * 0.17;
     return Semantics(
       slider: true,
-      label: 'Cleaning time',
-      value: '$minutes minutes',
-      increasedValue: '${math.min(minutes + 1, _max)} minutes',
-      decreasedValue: '${math.max(minutes - 1, 1)} minutes',
+      label: context.l10n.cleaningTime,
+      value: context.l10n.minutesLong(minutes),
+      increasedValue: context.l10n.minutesLong(math.min(minutes + 1, _max)),
+      decreasedValue: context.l10n.minutesLong(math.max(minutes - 1, 1)),
       onIncrease: () => onChanged(math.min(minutes + 1, _max)),
       onDecrease: () => onChanged(math.max(minutes - 1, 1)),
       child: GestureDetector(
@@ -214,7 +215,7 @@ class _TimerDial extends StatelessWidget {
                     children: [
                       Text('$minutes', style: AppText.bold(32, height: 1.1)),
                       Text(
-                        'Minutes',
+                        context.l10n.minutesTitle,
                         style: AppText.body(color: AppColors.grey),
                       ),
                     ],
@@ -325,7 +326,7 @@ class _ScheduleCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Schedule To',
+                  context.l10n.scheduleTo,
                   style: AppText.body(size: 16, color: AppColors.grey),
                 ),
               ),
@@ -345,7 +346,7 @@ class _ScheduleCard extends StatelessWidget {
                 spacing: 4,
                 children: [
                   for (final t in CleanTime.values)
-                    Expanded(child: _segment(t, t == time)),
+                    Expanded(child: _segment(context, t, t == time)),
                 ],
               ),
             ),
@@ -355,7 +356,7 @@ class _ScheduleCard extends StatelessWidget {
     );
   }
 
-  Widget _segment(CleanTime t, bool selected) {
+  Widget _segment(BuildContext context, CleanTime t, bool selected) {
     final (icon, color) = _icon(t);
     final radius = BorderRadius.circular(14);
     return Pressable(
@@ -385,7 +386,7 @@ class _ScheduleCard extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              t.label,
+              t.label(context.l10n),
               maxLines: 1,
               style: AppText.body(
                 size: 16,

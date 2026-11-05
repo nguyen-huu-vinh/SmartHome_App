@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/sample_data.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/large_title_page.dart';
 import '../../widgets/layout.dart';
@@ -29,20 +30,18 @@ class _AddDevicesScreenState extends State<AddDevicesScreen> {
         if (c.name.toLowerCase().contains(q)) c,
     ];
     return LargeTitlePage(
-      title: 'Add Devices',
-      subtitle:
-          'Choose a device type below. Keep your device close by to pair '
-          'it quickly.',
+      title: context.l10n.addDevices,
+      subtitle: context.l10n.chooseDeviceType,
       children: [
         SearchBox(
-          hint: 'Search Devices',
+          hint: context.l10n.searchDevices,
           onChanged: (v) => setState(() => _query = v),
         ),
         const SizedBox(height: 20),
         if (items.isEmpty)
           EmptyState(
             icon: Icons.search_off_rounded,
-            message: 'No devices match “${_query.trim()}”',
+            message: context.l10n.noDevicesMatch(_query.trim()),
           ),
         for (final c in items)
           Padding(
@@ -51,7 +50,7 @@ class _AddDevicesScreenState extends State<AddDevicesScreen> {
             child: ListCard(
               leading: AppImage(c.image),
               title: c.name,
-              subtitle: '${c.count} Devices',
+              subtitle: context.l10n.devicesCountText(c.count),
               trailing: const Icon(
                 Icons.arrow_right,
                 size: 32,

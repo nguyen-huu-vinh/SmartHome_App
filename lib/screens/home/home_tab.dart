@@ -7,6 +7,7 @@ import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/home_device.dart';
 import '../../data/room.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/device_cards.dart';
 import '../../widgets/device_sheet/device_sheet.dart';
@@ -18,14 +19,24 @@ import '../../widgets/room_cards.dart';
 import '../../widgets/search_box.dart';
 import 'device_list_screen.dart';
 
+/// Nhãn gắn vào các chỗ ở tab Home mà phần giới thiệu app làm sáng.
+class HomeTourKeys {
+  final home = GlobalKey(debugLabel: 'tour: home');
+  final search = GlobalKey(debugLabel: 'tour: search');
+  final rooms = GlobalKey(debugLabel: 'tour: rooms');
+  final featured = GlobalKey(debugLabel: 'tour: featured');
+}
+
 /// Tab Home: chọn nhà, tìm / lọc theo phòng, thẻ nổi bật,
 /// các nhóm thiết bị cuộn ngang.
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key, required this.resetToken});
+  const HomeTab({super.key, required this.resetToken, this.tour});
 
   /// Đổi giá trị → về trạng thái ban đầu: bỏ tìm kiếm, bỏ lọc phòng,
   /// thẻ nổi bật về trang đầu, cuộn lên đầu.
   final int resetToken;
+
+  final HomeTourKeys? tour;
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -77,7 +88,7 @@ class _HomeTabState extends State<HomeTab> {
     final app = AppScope.read(context);
     final r = await showManageHomesSheet(
       context,
-      homes: app.homes,
+      homes: app.homesOr(context.l10n.defaultHomeName),
       index: app.homeIndex,
     );
     if (r != null) app.setHomes(r.homes, index: r.index);
@@ -99,12 +110,14 @@ class _HomeTabState extends State<HomeTab> {
       for (final d in visible)
         if (d.switchable) d,
     ];
+    final tour = widget.tour;
     return Column(
       children: [
         HomeSwitcherHeader(
-          homes: app.homes,
+          homes: app.homesOr(context.l10n.defaultHomeName),
           index: app.homeIndex,
           onTap: _manageHomes,
+          nameKey: tour?.home,
         ),
         Expanded(
           child: AppRefresh(
@@ -119,8 +132,9 @@ class _HomeTabState extends State<HomeTab> {
               children: [
                 _pad(
                   SearchBox(
+                    key: tour?.search,
                     controller: _search,
-                    hint: 'Search Devices',
+                    hint: context.l10n.searchDevices,
                     onChanged: (v) => setState(() {
                       _query = v;
                       _resetPage();
@@ -129,6 +143,7 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 const SizedBox(height: 16),
                 HorizontalList(
+                  key: tour?.rooms,
                   height: AppSizes.scaled(context, 58),
                   itemCount: app.rooms.length,
                   itemBuilder: (_, i) {
@@ -155,9 +170,9 @@ class _HomeTabState extends State<HomeTab> {
                       if (d.group == g) d,
                   ]),
                 if (visible.isEmpty)
-                  const EmptyState(
+                  EmptyState(
                     icon: Icons.search_off_rounded,
-                    message: 'No devices found',
+                    message: context.l10n.noDevicesFound,
                   ),
               ],
             ),
@@ -186,6 +201,8 @@ class _HomeTabState extends State<HomeTab> {
               final d = items[i];
               return _pad(
                 FeaturedCard(
+                  // Giới thiệu app làm sáng thẻ đầu tiên.
+                  key: i == 0 ? widget.tour?.featured : null,
                   device: d,
                   on: app.isOn(d),
                   onChanged: (v) => app.setOn(d, v),
@@ -207,9 +224,9 @@ class _HomeTabState extends State<HomeTab> {
       const SizedBox(height: 18),
       _pad(
         SectionHeader(
-          g.title,
+          g.title(context.l10n),
           trailing: LinkButton(
-            label: 'View all',
+            label: context.l10n.viewAll,
             onTap: () => Navigator.push(
               context,
               smoothRoute(DeviceListScreen(group: g)),
@@ -245,7 +262,7 @@ class _PageDots extends StatelessWidget {
     // Chấm đầu tiên của cửa sổ: giữ trang hiện tại ở giữa nếu được.
     final start = (index - _visible ~/ 2).clamp(0, count - shown);
     return Semantics(
-      label: 'Page ${index + 1} of $count',
+      label: context.l10n.pageOf(index + 1, count),
       child: SizedBox(
         width: shown * _slot,
         height: 8,

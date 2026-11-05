@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/feedback.dart';
 import '../core/theme.dart';
 import '../data/app_state.dart';
+import '../l10n/l10n.dart';
 import 'layout.dart';
 
 /// Danh sách cuộn dọc có phân trang và kéo để làm mới.
@@ -113,7 +114,7 @@ class _PagedListState extends State<PagedList> {
         _failed = false;
       });
     } catch (_) {
-      if (mounted) context.toast("Couldn't refresh. Check your connection.");
+      if (mounted) context.toast(context.l10n.couldntRefresh);
     }
   }
 
@@ -150,11 +151,11 @@ class _PagedListState extends State<PagedList> {
     );
   }
 
-  static Widget _spinner() => Padding(
+  Widget _spinner() => Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Center(
       child: Semantics(
-        label: 'Loading more',
+        label: context.l10n.loadingMore,
         child: const CircularProgressIndicator.adaptive(),
       ),
     ),
@@ -162,8 +163,11 @@ class _PagedListState extends State<PagedList> {
 
   Widget _retry() => Column(
     children: [
-      Text("Couldn't load more", style: AppText.body(color: AppColors.grey)),
-      TextButton(onPressed: _loadMore, child: const Text('Retry')),
+      Text(
+        context.l10n.couldntLoadMore,
+        style: AppText.body(color: AppColors.grey),
+      ),
+      TextButton(onPressed: _loadMore, child: Text(context.l10n.retry)),
     ],
   );
 }

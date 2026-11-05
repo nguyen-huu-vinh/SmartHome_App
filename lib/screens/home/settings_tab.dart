@@ -6,10 +6,13 @@ import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/user.dart';
+import '../../l10n/l10n.dart';
+import '../../widgets/app_sheet.dart';
 import '../../widgets/name_input_sheet.dart';
 import '../auth/login_screen.dart';
 import '../settings/legal_screen.dart';
 import '../settings/profile_screen.dart';
+import 'home_screen.dart';
 import 'tab_page.dart';
 
 /// Tab Settings: hồ sơ, các công tắc tuỳ chọn ([Preference]),
@@ -21,7 +24,7 @@ class SettingsTab extends StatelessWidget {
 
   Future<void> _share(BuildContext context) async {
     await Clipboard.setData(const ClipboardData(text: _appLink));
-    if (context.mounted) context.toast('App link copied to clipboard');
+    if (context.mounted) context.toast(context.l10n.appLinkCopied);
   }
 
   Future<void> _rate(BuildContext context) async {
@@ -30,29 +33,29 @@ class SettingsTab extends StatelessWidget {
       builder: (_) => const _RateDialog(),
     );
     if (stars != null && context.mounted) {
-      context.toast('Thanks for rating us $stars★');
+      context.toast(context.l10n.thanksRating(stars));
     }
   }
 
   Future<void> _feedback(BuildContext context) async {
     final text = await showNameInputSheet(
       context,
-      title: 'Send Feedback',
-      hint: 'Your feedback',
-      action: 'Send',
+      title: context.l10n.sendFeedback,
+      hint: context.l10n.yourFeedback,
+      action: context.l10n.send,
       capitalization: TextCapitalization.sentences,
       icon: const Icon(Icons.chat_rounded, color: AppColors.brand),
     );
     if (text != null && context.mounted) {
-      context.toast('Thanks for your feedback!');
+      context.toast(context.l10n.thanksFeedback);
     }
   }
 
   Future<void> _logout(BuildContext context) async {
     final ok = await context.confirm(
-      title: 'Log out?',
-      message: 'You will need to log in again to control your home.',
-      confirmLabel: 'Log out',
+      title: context.l10n.logoutTitle,
+      message: context.l10n.logoutMessage,
+      confirmLabel: context.l10n.logout,
       destructive: true,
     );
     if (!ok || !context.mounted) return;
@@ -61,6 +64,40 @@ class SettingsTab extends StatelessWidget {
       riseRoute(const LoginScreen()),
       (_) => false,
     );
+  }
+
+  /// Bảng chọn ngôn ngữ; mỗi ngôn ngữ ghi bằng chính tiếng đó.
+  Future<void> _language(BuildContext context) async {
+    final current = Localizations.localeOf(context).languageCode;
+    final picked = await showAppSheet<Locale>(
+      context,
+      builder: (c) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 12, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SheetHeader(title: c.l10n.language),
+            const SizedBox(height: 8),
+            for (final locale in AppLocalizations.supportedLocales)
+              ListTile(
+                contentPadding: const EdgeInsets.only(right: 12),
+                title: Text(
+                  lookupAppLocalizations(locale).languageName,
+                  style: AppText.body(size: 16),
+                ),
+                trailing: locale.languageCode == current
+                    ? const Icon(Icons.check_rounded, color: AppColors.brand)
+                    : null,
+                selected: locale.languageCode == current,
+                onTap: () => Navigator.pop(c, locale),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (picked != null && context.mounted) {
+      await AppScope.read(context).setLocale(picked);
+    }
   }
 
   void _open(BuildContext context, Widget page) =>
@@ -82,7 +119,7 @@ class SettingsTab extends StatelessWidget {
         );
 
     return TabPage(
-      title: 'Settings',
+      title: context.l10n.settings,
       children: [
         _SettingsGroup([
           _SettingsRow(
@@ -96,7 +133,7 @@ class SettingsTab extends StatelessWidget {
           for (final p in Preference.values)
             _SettingsRow(
               icon: p.icon,
-              label: p.label,
+              label: p.label(context.l10n),
               onTap: () => app.setPref(p, !app.pref(p)),
               trailing: ExcludeSemantics(
                 child: Switch(
@@ -108,22 +145,54 @@ class SettingsTab extends StatelessWidget {
             ),
         ]),
         _SettingsGroup([
-          link(Icons.share_rounded, 'Share this app', () => _share(context)),
-          link(Icons.star_rounded, 'Rate Us', () => _rate(context)),
-          link(Icons.chat_rounded, 'Send Feedback', () => _feedback(context)),
+          _SettingsRow(
+            icon: Icons.language_rounded,
+            label: context.l10n.language,
+            onTap: () => _language(context),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  context.l10n.languageName,
+                  style: AppText.body(size: 16, color: AppColors.grey),
+                ),
+                const Icon(Icons.arrow_right_rounded, color: AppColors.grey),
+              ],
+            ),
+          ),
+          link(
+            Icons.tour_rounded,
+            context.l10n.appTour,
+            () => HomeScreen.replayTour(context),
+          ),
+          link(
+            Icons.share_rounded,
+            context.l10n.shareApp,
+            () => _share(context),
+          ),
+          link(Icons.star_rounded, context.l10n.rateUs, () => _rate(context)),
+          link(
+            Icons.chat_rounded,
+            context.l10n.sendFeedback,
+            () => _feedback(context),
+          ),
         ]),
         _SettingsGroup([
           link(
             Icons.verified_user_rounded,
-            'Privacy Policy',
+            context.l10n.privacyPolicy,
             () => _open(context, const LegalScreen(doc: LegalDoc.privacy)),
           ),
           link(
             Icons.edit_note_rounded,
-            'Terms of Use',
+            context.l10n.termsOfUse,
             () => _open(context, const LegalScreen(doc: LegalDoc.terms)),
           ),
-          link(Icons.logout_rounded, 'Logout', () => _logout(context)),
+          link(
+            Icons.logout_rounded,
+            context.l10n.logoutRow,
+            () => _logout(context),
+          ),
         ]),
       ],
     );
@@ -232,7 +301,7 @@ class _RateDialogState extends State<_RateDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Rate Us'),
+      title: Text(context.l10n.rateUs),
       content: FittedBox(
         fit: BoxFit.scaleDown,
         child: Row(
@@ -240,7 +309,7 @@ class _RateDialogState extends State<_RateDialog> {
           children: [
             for (var i = 1; i <= 5; i++)
               IconButton(
-                tooltip: plural(i, 'star'),
+                tooltip: context.l10n.starsCount(i),
                 onPressed: () {
                   HapticFeedback.selectionClick();
                   setState(() => _stars = i);
@@ -263,11 +332,11 @@ class _RateDialogState extends State<_RateDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         TextButton(
           onPressed: _stars == 0 ? null : () => Navigator.pop(context, _stars),
-          child: const Text('Submit'),
+          child: Text(context.l10n.submit),
         ),
       ],
     );

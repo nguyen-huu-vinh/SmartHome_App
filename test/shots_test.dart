@@ -10,6 +10,7 @@ import 'package:smarthome_app/data/country.dart';
 import 'package:smarthome_app/data/fake_home_api.dart';
 import 'package:smarthome_app/data/home_device.dart';
 import 'package:smarthome_app/data/sample_data.dart';
+import 'package:smarthome_app/l10n/l10n.dart';
 import 'package:smarthome_app/screens/auth/login_phone_screen.dart';
 import 'package:smarthome_app/screens/auth/login_screen.dart';
 import 'package:smarthome_app/screens/auth/signup_screen.dart';
@@ -33,7 +34,12 @@ import 'package:smarthome_app/widgets/manage_homes_sheet.dart';
 import 'package:smarthome_app/widgets/manage_room_sheet.dart';
 import 'package:smarthome_app/widgets/name_input_sheet.dart';
 
-const _dir = 'goldens/after';
+/// Chụp tiếng Việt: `flutter test test/shots_test.dart --dart-define=LANG=vi
+/// --update-goldens` → ảnh vào goldens/vi (chỉ để xem, không so sánh).
+const _lang = String.fromEnvironment('LANG', defaultValue: 'en');
+const _locale = Locale(_lang);
+const _dir = _lang == 'en' ? 'goldens/after' : 'goldens/$_lang';
+final _l10n = lookupAppLocalizations(_locale);
 
 Future<void> _font(String family, String path) async {
   final loader = FontLoader(family)
@@ -59,6 +65,9 @@ Widget _app(Widget home) => AppScope(
   child: MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: buildAppTheme(),
+    locale: _locale,
+    supportedLocales: AppLocalizations.supportedLocales,
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
     home: home,
   ),
 );
@@ -159,21 +168,21 @@ void main() {
     '14_rooms',
     () => _app(const HomeScreen()),
     act: (t) async {
-      await t.tap(find.byTooltip('Rooms'));
+      await t.tap(find.byTooltip(_l10n.navRooms));
     },
   );
   shot(
     '15_alerts',
     () => _app(const HomeScreen()),
     act: (t) async {
-      await t.tap(find.byTooltip('Notifications'));
+      await t.tap(find.byTooltip(_l10n.navNotifications));
     },
   );
   shot(
     '16_settings',
     () => _app(const HomeScreen()),
     act: (t) async {
-      await t.tap(find.byTooltip('Settings'));
+      await t.tap(find.byTooltip(_l10n.navSettings));
     },
   );
   shot('17_profile', () => _app(const ProfileScreen()));

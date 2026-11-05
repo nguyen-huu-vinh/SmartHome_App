@@ -19,40 +19,31 @@ class LightSettings {
   int runHours = 4;
   int aqi = 72;
 
-  String get aqiLabel => switch (aqi) {
-    <= 50 => 'Good',
-    <= 100 => 'Moderate',
-    _ => 'Unhealthy',
-  };
-
   void setBrightness(int v) =>
       brightness = v.clamp(minBrightness, maxBrightness);
 }
 
 // ───────────────────────── Máy lạnh ─────────────────────────
 
+/// Tên hiển thị: `mode.label(context.l10n)` (xem `l10n.dart`).
 enum AcMode {
-  cool('Cool', Icons.ac_unit_rounded),
-  heat('Heat', Icons.wb_sunny_rounded),
-  dry('Dry', Icons.water_drop_rounded),
-  fan('Fan', Icons.air_rounded),
-  auto('Auto', Icons.autorenew_rounded);
+  cool(Icons.ac_unit_rounded),
+  heat(Icons.wb_sunny_rounded),
+  dry(Icons.water_drop_rounded),
+  fan(Icons.air_rounded),
+  auto(Icons.autorenew_rounded);
 
-  const AcMode(this.label, this.icon);
-  final String label;
+  const AcMode(this.icon);
   final IconData icon;
 
   AcMode get next => values[(index + 1) % values.length];
 }
 
 enum AcFan {
-  auto('Auto'),
-  low('Low'),
-  medium('Medium'),
-  high('High');
-
-  const AcFan(this.label);
-  final String label;
+  auto,
+  low,
+  medium,
+  high;
 
   AcFan get next => values[(index + 1) % values.length];
 }
@@ -105,15 +96,7 @@ class CameraSettings {
 // ───────────────────────── Máy hút bụi ─────────────────────────
 
 /// Buổi trong ngày để hẹn giờ dọn.
-enum CleanTime {
-  morning('Morning'),
-  noon('Noon'),
-  evening('Evening'),
-  night('Night');
-
-  const CleanTime(this.label);
-  final String label;
-}
+enum CleanTime { morning, noon, evening, night }
 
 class CleanerSettings {
   static const maxMinutes = 60;

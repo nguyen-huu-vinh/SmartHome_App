@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../core/theme.dart';
 import '../data/country.dart';
+import '../l10n/l10n.dart';
 import 'app_text_field.dart';
 import 'country_picker.dart';
 import 'pressable.dart';
@@ -32,7 +33,7 @@ class PhoneField extends StatelessWidget {
             final c = await showCountryPicker(context, country);
             if (c != null) onCountryChanged(c);
           },
-          semanticLabel: 'Country code ${country.code}, change',
+          semanticLabel: context.l10n.countryCodeChange(country.code),
           borderRadius: BorderRadius.circular(AppSizes.radiusS),
           decoration: fieldBoxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -50,7 +51,7 @@ class PhoneField extends StatelessWidget {
         Expanded(
           child: AppTextField(
             controller: controller,
-            hint: 'Eg, 1234567890',
+            hint: context.l10n.phoneHint,
             keyboardType: TextInputType.phone,
             textInputAction: textInputAction,
             autofillHints: const [AutofillHints.telephoneNumberNational],

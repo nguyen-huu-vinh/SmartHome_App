@@ -17,6 +17,10 @@ dependencies:
   flutter_svg: ^2.3.0
   google_sign_in: ^7.2.0
   http: ^1.6.0
+  shared_preferences: ^2.5.6
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -25,6 +29,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Tạo lib/l10n/app_localizations.dart từ các file lib/l10n/*.arb.
+  generate: true
 
   assets:
     - assets/images/

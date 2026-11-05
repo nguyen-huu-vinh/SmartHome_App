@@ -1,0 +1,6 @@
+# Đa ngôn ngữ: câu chữ nằm trong lib/l10n/app_<mã>.arb (Anh là bản gốc).
+# Sửa .arb rồi chạy `flutter gen-l10n` (hoặc `flutter run`) để tạo lại code.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+nullable-getter: false

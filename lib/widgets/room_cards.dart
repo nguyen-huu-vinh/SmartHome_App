@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../core/feedback.dart';
 import '../core/theme.dart';
 import '../data/room.dart';
+import '../l10n/l10n.dart';
 import 'app_card.dart';
 import 'badges.dart';
 
@@ -94,7 +94,7 @@ class RoomChip extends StatelessWidget {
                   style: AppText.name,
                 ),
                 Text(
-                  plural(count, 'Device'),
+                  context.l10n.devicesCount(count),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppText.body(color: AppColors.grey),

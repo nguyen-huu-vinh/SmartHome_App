@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/device.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/headers.dart';
@@ -102,10 +103,10 @@ class _AddingDeviceScreenState extends State<AddingDeviceScreen> {
                       const SizedBox(height: 12),
                       Text(
                         _step == _Step.done
-                            ? 'Added to your home'
+                            ? context.l10n.addedToHome
                             : total > 1
-                            ? 'Adding to your home (${_index + 1}/$total)'
-                            : 'Adding to your home',
+                            ? context.l10n.addingToHomeCount(_index + 1, total)
+                            : context.l10n.addingToHome,
                         style: AppText.body(size: 16, color: AppColors.grey),
                       ),
                       const SizedBox(height: 24),
@@ -195,12 +196,11 @@ class _SignalState extends State<_Signal> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final lit = widget.active || widget.done;
     return Semantics(
-      label:
-          '${widget.label} ${widget.done
-              ? 'connected'
-              : widget.active
-              ? 'connecting'
-              : 'waiting'}',
+      label: widget.done
+          ? context.l10n.signalConnected(widget.label)
+          : widget.active
+          ? context.l10n.signalConnecting(widget.label)
+          : context.l10n.signalWaiting(widget.label),
       child: FadeTransition(
         opacity: _pulse,
         child: Icon(

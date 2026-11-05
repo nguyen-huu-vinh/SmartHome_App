@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../core/feedback.dart';
 import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/device.dart';
+import '../../data/home_api.dart';
+import '../../data/home_device.dart';
 import '../../data/room.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/auth_layout.dart';
 import '../../widgets/badges.dart';
@@ -51,8 +55,10 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
   Future<void> _addRoom() async {
     final name = await showAddRoomSheet(context);
     if (name == null || !mounted) return;
+    final app = AppScope.read(context);
+    if (app.hasRoom(name)) return context.toast(context.l10n.roomExists(name));
     final room = Room(name: name);
-    AppScope.read(context).addRoom(room);
+    app.addRoom(room);
     setState(() => _picked = room);
     // Phòng mới nằm cuối danh sách ngang → cuộn tới cho thấy.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,12 +71,35 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
     });
   }
 
-  /// Xong thiết lập → vào Home, không quay lại được các bước trước.
-  void _finish() => Navigator.pushAndRemoveUntil(
-    context,
-    smoothRoute(const HomeScreen()),
-    (_) => false,
-  );
+  var _saving = false;
+
+  /// Lưu các thiết bị vào nhà (đúng phòng đã gán) → vào Home, không quay lại
+  /// được các bước trước. Server lỗi → ở lại để bấm Continue thử lại.
+  Future<void> _finish() async {
+    setState(() => _saving = true);
+    try {
+      await AppScope.read(context).addDevices([
+        for (final MapEntry(key: d, value: room) in _assigned.entries)
+          HomeDevice(
+            name: d.name,
+            image: d.image,
+            group: d.group,
+            room: room.name,
+          ),
+      ]);
+    } on ApiException {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      context.toast(context.l10n.couldntAddDevices);
+      return;
+    }
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      smoothRoute(const HomeScreen()),
+      (_) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,20 +107,20 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
     // Phòng đang chọn bị xoá ở nơi khác → về phòng đầu.
     final room = rooms.contains(_picked) ? _picked! : rooms.first;
     return LargeTitlePage(
-      title: 'Manage Rooms & Devices',
-      subtitle: 'Pick a room, then tick the devices that belong to it',
+      title: context.l10n.manageRoomsTitle,
+      subtitle: context.l10n.manageRoomsSubtitle,
       // Nút + dòng "Add Now" ghim dưới đáy, nội dung phía trên cuộn.
       bottom: Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
         children: [
           PrimaryButton(
-            label: 'Continue',
-            onPressed: _assigned.isEmpty ? null : _finish,
+            label: context.l10n.continueLabel,
+            onPressed: _assigned.isEmpty || _saving ? null : _finish,
           ),
           AuthFooter(
-            text: 'Missed a device? ',
-            link: 'Add Now',
+            text: context.l10n.missedDevice,
+            link: context.l10n.addNow,
             onTap: () =>
                 Navigator.push(context, smoothRoute(const AddDevicesScreen())),
           ),
@@ -99,9 +128,9 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
       ),
       children: [
         SectionHeader(
-          'Select Room',
+          context.l10n.selectRoom,
           trailing: LinkButton(
-            label: 'Add Room',
+            label: context.l10n.addRoom,
             style: AppText.medium(16),
             trailing: const AddBadge(),
             onTap: _addRoom,
@@ -121,13 +150,13 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        const SectionHeader('Assign devices'),
+        SectionHeader(context.l10n.assignDevices),
         const SizedBox(height: 16),
         if (widget.devices.isEmpty)
-          const EmptyState(
+          EmptyState(
             icon: Icons.devices_other_rounded,
-            message: 'No connected devices yet.',
-            padding: EdgeInsets.symmetric(vertical: 16),
+            message: context.l10n.noConnectedDevices,
+            padding: const EdgeInsets.symmetric(vertical: 16),
           ),
         for (final d in widget.devices)
           Padding(
@@ -136,8 +165,8 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
               device: d,
               // Thiết bị đang ở phòng khác → hiện tên phòng đó.
               status: switch (_assigned[d]) {
-                final r? when r != room => 'Connected · ${r.name}',
-                _ => 'Connected',
+                final r? when r != room => context.l10n.connectedInRoom(r.name),
+                _ => context.l10n.connected,
               },
               selected: _assigned[d] == room,
               onTap: () => _toggle(d, room),

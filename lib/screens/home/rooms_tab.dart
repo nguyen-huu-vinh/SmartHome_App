@@ -5,6 +5,7 @@ import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/room.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/badges.dart';
@@ -35,8 +36,8 @@ class _RoomsTabState extends State<RoomsTab> {
     final i = app.removeRoom(room);
     if (i == null) return;
     context.toast(
-      '${room.name} removed',
-      action: 'Undo',
+      context.l10n.removedNamed(room.name),
+      action: context.l10n.undo,
       onAction: () => app.insertRoom(i, room),
     );
   }
@@ -56,7 +57,9 @@ class _RoomsTabState extends State<RoomsTab> {
   Future<void> _add() async {
     final name = await showAddRoomSheet(context);
     if (name == null || !mounted) return;
-    AppScope.read(context).addRoom(Room(name: name));
+    final app = AppScope.read(context);
+    if (app.hasRoom(name)) return context.toast(context.l10n.roomExists(name));
+    app.addRoom(Room(name: name));
   }
 
   @override
@@ -65,7 +68,7 @@ class _RoomsTabState extends State<RoomsTab> {
     final rooms = app.rooms;
     final tileHeight = AppSizes.scaled(context, _tileHeight);
     return TabPage(
-      title: 'Rooms',
+      title: context.l10n.rooms,
       children: [
         GridView.builder(
           shrinkWrap: true,
@@ -89,11 +92,15 @@ class _RoomsTabState extends State<RoomsTab> {
                       ? () => _remove(rooms[i])
                       : null,
                 )
-              : AddTile(label: 'Add Room', onTap: _add, height: tileHeight),
+              : AddTile(
+                  label: context.l10n.addRoom,
+                  onTap: _add,
+                  height: tileHeight,
+                ),
         ),
         const SizedBox(height: 16),
         PrimaryButton(
-          label: _editing ? 'Done' : 'Manage',
+          label: _editing ? context.l10n.done : context.l10n.manage,
           onPressed: () => setState(() => _editing = !_editing),
         ),
       ],
@@ -137,7 +144,7 @@ class _RoomTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  plural(count, 'Device'),
+                  context.l10n.devicesCount(count),
                   maxLines: 1,
                   style: AppText.body(color: AppColors.grey),
                 ),
@@ -150,7 +157,7 @@ class _RoomTile extends StatelessWidget {
             top: 0,
             right: 0,
             child: RemoveBadge(
-              label: 'Remove ${room.name}',
+              label: context.l10n.removeNamed(room.name),
               size: 24,
               onTap: onRemove,
             ),

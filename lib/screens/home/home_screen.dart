@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../core/routes.dart';
+import '../../core/theme.dart';
 import '../../data/app_state.dart';
+import '../../l10n/l10n.dart';
+import '../../widgets/app_tour.dart';
 import '../../widgets/fade_indexed_stack.dart';
 import '../../widgets/floating_nav_bar.dart';
 import '../setup/add_devices_screen.dart';
@@ -15,6 +18,10 @@ import 'settings_tab.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  /// Xem lại phần giới thiệu app (VD: từ tab Settings).
+  static void replayTour(BuildContext context) =>
+      context.findAncestorStateOfType<_HomeScreenState>()?._startTour();
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -24,6 +31,78 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Tăng lên mỗi lần bấm Home → trang Home về trạng thái ban đầu.
   var _homeResets = 0;
+
+  final _tourKeys = HomeTourKeys();
+  final _navKeys = {
+    NavTab.add: GlobalKey(debugLabel: 'tour: add'),
+    NavTab.alerts: GlobalKey(debugLabel: 'tour: alerts'),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _firstTour();
+  }
+
+  /// Lần đầu vào app → tự mở phần giới thiệu.
+  Future<void> _firstTour() async {
+    if (await AppTour.seen() || !mounted) return;
+    await _startTour();
+  }
+
+  /// Về tab Home ở trạng thái ban đầu, chờ màn hiện xong rồi giới thiệu.
+  Future<void> _startTour() async {
+    setState(() {
+      _homeResets++;
+      _tab = NavTab.home;
+    });
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    // Trong lúc chờ đã mở màn khác → thôi, lần sau vào app sẽ giới thiệu.
+    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? true)) return;
+    final l = context.l10n;
+    await AppTour.show(context, [
+      TourStep(
+        target: _tourKeys.home,
+        icon: Icons.home_rounded,
+        radius: 999,
+        title: l.tourHomeTitle,
+        message: l.tourHomeMessage,
+      ),
+      TourStep(
+        target: _tourKeys.search,
+        icon: Icons.search_rounded,
+        title: l.tourSearchTitle,
+        message: l.tourSearchMessage,
+      ),
+      TourStep(
+        target: _tourKeys.rooms,
+        icon: Icons.meeting_room_rounded,
+        radius: AppSizes.radiusS,
+        title: l.tourRoomsTitle,
+        message: l.tourRoomsMessage,
+      ),
+      TourStep(
+        target: _tourKeys.featured,
+        icon: Icons.power_settings_new_rounded,
+        title: l.tourFeaturedTitle,
+        message: l.tourFeaturedMessage,
+      ),
+      TourStep(
+        target: _navKeys[NavTab.add]!,
+        icon: Icons.add_rounded,
+        radius: 999,
+        title: l.tourAddTitle,
+        message: l.tourAddMessage,
+      ),
+      TourStep(
+        target: _navKeys[NavTab.alerts]!,
+        icon: Icons.notifications_rounded,
+        radius: 999,
+        title: l.tourAlertsTitle,
+        message: l.tourAlertsMessage,
+      ),
+    ]);
+  }
 
   void _onNav(NavTab tab) {
     if (tab == NavTab.add) {
@@ -47,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
           current: _tab,
           onTap: _onNav,
           badges: {NavTab.alerts: AppScope.of(context).alertCount},
+          targets: _navKeys,
         ),
       ),
       // Giữ nguyên trạng thái từng tab (vị trí cuộn, ô tìm kiếm).
@@ -58,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           NavTab.settings => 3,
         },
         children: [
-          HomeTab(resetToken: _homeResets),
+          HomeTab(resetToken: _homeResets, tour: _tourKeys),
           const RoomsTab(),
           const AlertsTab(),
           const SettingsTab(),

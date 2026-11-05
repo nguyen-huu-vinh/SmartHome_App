@@ -8,6 +8,7 @@ import '../../core/theme.dart';
 import '../../core/validators.dart';
 import '../../data/app_state.dart';
 import '../../data/user.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/auth_layout.dart';
@@ -80,11 +81,11 @@ class _SignupScreenState extends State<SignupScreen> {
       fitContent: true,
       heroMaxFraction: 0.45,
       children: [
-        const AuthHeader(title: 'Create Account'),
+        AuthHeader(title: context.l10n.createAccount),
         const SizedBox(height: 12),
         AppTextField(
           controller: _name,
-          hint: 'Your name',
+          hint: context.l10n.yourName,
           prefix: const Icon(Icons.person, color: AppColors.brand, size: 20),
           textCapitalization: TextCapitalization.words,
           textInputAction: TextInputAction.next,
@@ -100,7 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
         const SizedBox(height: 12),
         AppTextField(
           controller: _email,
-          hint: 'Your email address',
+          hint: context.l10n.yourEmail,
           prefix: AppIcon.email.widget(20),
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
@@ -109,7 +110,7 @@ class _SignupScreenState extends State<SignupScreen> {
         const SizedBox(height: 12),
         AppTextField(
           controller: _pass,
-          hint: 'Create password',
+          hint: context.l10n.createPassword,
           prefix: AppIcon.lock.widget(20),
           password: true,
           textInputAction: TextInputAction.done,
@@ -122,7 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ListenableBuilder(
           listenable: _anyChange,
           builder: (_, _) => PrimaryButton(
-            label: 'Continue',
+            label: context.l10n.continueLabel,
             onPressed: _valid ? _continue : null,
           ),
         ),
@@ -130,17 +131,17 @@ class _SignupScreenState extends State<SignupScreen> {
         Text.rich(
           textAlign: TextAlign.center,
           TextSpan(
-            text: 'By creating an account you agree to Hoome’s ',
+            text: context.l10n.agreePrefix,
             style: terms,
             children: [
               TextSpan(
-                text: 'Terms of Use',
+                text: context.l10n.termsOfUse,
                 style: termsLink,
                 recognizer: _terms,
               ),
-              const TextSpan(text: ' & '),
+              TextSpan(text: context.l10n.agreeAnd),
               TextSpan(
-                text: 'Privacy Policy',
+                text: context.l10n.privacyPolicy,
                 style: termsLink,
                 recognizer: _privacy,
               ),
@@ -153,23 +154,21 @@ class _SignupScreenState extends State<SignupScreen> {
         SocialRow(
           children: [
             SocialButton(
-              tooltip: 'Continue with Apple',
+              tooltip: context.l10n.continueWithApple,
               icon: const Icon(Icons.apple, size: 28),
-              onPressed: () =>
-                  context.toast('Sign up with Apple is coming soon'),
+              onPressed: () => context.toast(context.l10n.signUpAppleSoon),
             ),
             SocialButton(
-              tooltip: 'Continue with Google',
+              tooltip: context.l10n.continueWithGoogle,
               icon: AppIcon.google.widget(28),
-              onPressed: () =>
-                  context.toast('Sign up with Google is coming soon'),
+              onPressed: () => context.toast(context.l10n.signUpGoogleSoon),
             ),
           ],
         ),
         const SizedBox(height: 12),
         AuthFooter(
-          text: 'Already have an account? ',
-          link: 'Login',
+          text: context.l10n.haveAccount,
+          link: context.l10n.login,
           fontSize: 16,
           onTap: () => Navigator.pop(context),
         ),

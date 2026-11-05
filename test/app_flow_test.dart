@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smarthome_app/data/app_state.dart';
 import 'package:smarthome_app/data/fake_home_api.dart';
 import 'package:smarthome_app/data/home_device.dart';
 import 'package:smarthome_app/data/sample_data.dart';
+import 'package:smarthome_app/main.dart';
 import 'package:smarthome_app/screens/auth/login_screen.dart';
 import 'package:smarthome_app/screens/auth/signup_screen.dart';
 import 'package:smarthome_app/screens/auth/verify_screen.dart';
@@ -13,6 +16,7 @@ import 'package:smarthome_app/screens/setup/adding_device_screen.dart';
 import 'package:smarthome_app/screens/setup/manage_homes_screen.dart';
 import 'package:smarthome_app/screens/setup/manage_rooms_screen.dart';
 import 'package:smarthome_app/widgets/app_buttons.dart';
+import 'package:smarthome_app/widgets/app_tour.dart';
 import 'package:smarthome_app/widgets/badges.dart';
 import 'package:smarthome_app/widgets/device_controls.dart';
 import 'package:smarthome_app/widgets/paged_list.dart';
@@ -330,6 +334,139 @@ void main() {
     await t.pumpAndSettle();
     expect(find.byType(ManageRoomsScreen), findsOneWidget);
     expect(find.byType(AddingDeviceScreen), findsNothing);
+  });
+
+  testWidgets('lần đầu vào app → giới thiệu 6 bước, xem xong thì nhớ', (
+    t,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    await pumpApp(t, const HomeScreen());
+    await t.pump(const Duration(seconds: 1)); // chờ màn hiện xong
+    await t.pumpAndSettle();
+    expect(find.text('Your home'), findsOneWidget);
+    expect(find.text('1/6'), findsOneWidget);
+
+    for (var i = 0; i < 5; i++) {
+      await t.tap(find.text('Next'));
+      await t.pumpAndSettle();
+    }
+    expect(find.text('Notifications'), findsOneWidget);
+    expect(find.text('Skip'), findsNothing, reason: 'bước cuối');
+    await t.tap(find.text('Got it'));
+    await t.pumpAndSettle();
+    expect(find.text('Got it'), findsNothing);
+    expect(await AppTour.seen(), isTrue);
+  });
+
+  testWidgets('Settings → App Tour mở lại giới thiệu, Skip để tắt', (t) async {
+    await pumpApp(t, const HomeScreen());
+    expect(find.text('Your home'), findsNothing, reason: 'đã xem rồi');
+    await tapNav(t, 'Settings');
+    await t.tap(find.text('App Tour'));
+    await t.pump(const Duration(seconds: 1));
+    await t.pumpAndSettle();
+    expect(find.text('Your home'), findsOneWidget);
+    expect(find.text('Search Devices'), findsOneWidget, reason: 'về tab Home');
+
+    await t.tap(find.text('Skip'));
+    await t.pumpAndSettle();
+    expect(find.text('Your home'), findsNothing);
+  });
+
+  testWidgets(
+    'Settings → Language → Tiếng Việt: cả app đổi chữ, nhớ lựa chọn',
+    (t) async {
+      final app = await pumpApp(t, const HomeScreen());
+      await tapNav(t, 'Settings');
+      await t.tap(find.text('Language'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Tiếng Việt'));
+      await t.pumpAndSettle();
+
+      expect(find.text('Ngôn ngữ'), findsOneWidget);
+      expect(find.text('Đăng xuất'), findsOneWidget);
+      expect(find.byTooltip('Trang chủ'), findsOneWidget, reason: 'thanh dưới');
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('locale'), 'vi');
+
+      // Mở lại app → đọc lựa chọn cũ.
+      final again = AppState(api: FakeHomeApi.instant());
+      await again.loadLocale();
+      expect(again.locale.value, const Locale('vi'));
+      expect(app.locale.value, const Locale('vi'));
+    },
+  );
+
+  testWidgets('gán phòng → Continue: thiết bị được lưu vào nhà, mở Home', (
+    t,
+  ) async {
+    final lamp = SampleData.nearby[0];
+    final app = await pumpApp(t, ManageRoomsScreen(devices: [lamp]));
+    final before = app.devices.length;
+    await t.tap(find.text(lamp.name));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Continue'));
+    await t.pumpAndSettle();
+
+    expect(app.devices.length, before + 1);
+    expect(app.devices.last.name, lamp.name);
+    expect(app.devices.last.room, app.rooms.first.name);
+    expect(find.byType(HomeScreen), findsOneWidget);
+  });
+
+  testWidgets('gán phòng mà mất mạng → ở lại, báo lỗi, bấm lại được', (
+    t,
+  ) async {
+    final api = FakeHomeApi(
+      alerts: SampleData.alerts,
+      delay: Duration.zero,
+      failRate: 0,
+    );
+    final lamp = SampleData.nearby[0];
+    final app = await pumpApp(t, ManageRoomsScreen(devices: [lamp]), api: api);
+    final before = app.devices.length;
+    await t.tap(find.text(lamp.name));
+    await t.pumpAndSettle();
+
+    api.failRate = 1;
+    await t.tap(find.text('Continue'));
+    await t.pumpAndSettle();
+    expect(find.byType(ManageRoomsScreen), findsOneWidget);
+    expect(
+      find.text("Couldn't add the devices. Check your connection."),
+      findsOneWidget,
+    );
+    expect(app.devices.length, before);
+
+    api.failRate = 0;
+    await t.tap(find.text('Continue'));
+    await t.pumpAndSettle();
+    expect(app.devices.length, before + 1);
+    expect(find.byType(HomeScreen), findsOneWidget);
+  });
+
+  testWidgets('đăng nhập lại khi đã có nhà → màn nhà hiện các nhà đã tạo', (
+    t,
+  ) async {
+    final api = FakeHomeApi(
+      alerts: SampleData.alerts,
+      homes: ['Beach House', 'Office'],
+      delay: Duration.zero,
+      failRate: 0,
+    );
+    final app = await pumpApp(t, const SizedBox(), api: api);
+    expect(app.hasHomes, isTrue, reason: 'nhà đã tải từ server');
+
+    await t.pumpWidget(
+      AppScope(
+        state: app,
+        child: const HoomeApp(home: ManageHomesScreen()),
+      ),
+    );
+    await t.pumpAndSettle();
+    expect(find.byType(ManageHomesScreen), findsOneWidget);
+    expect(find.text('Beach House'), findsOneWidget);
+    expect(find.text('Office'), findsOneWidget);
   });
 
   testWidgets('đăng nhập: Continue chỉ bấm được khi email + mật khẩu hợp lệ', (

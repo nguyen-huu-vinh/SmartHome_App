@@ -210,10 +210,26 @@ abstract final class SampleData {
 
   /// Thiết bị "tìm thấy" khi quét Bluetooth / Wi-Fi.
   static const nearby = [
-    Device(name: 'Havells Glamax 9W B22', image: '$_devices/bulb.png'),
-    Device(name: 'Tapo TP-Link C210 360°', image: '$_devices/camera.png'),
-    Device(name: 'Amazon Alexa 2', image: '$_devices/speaker.png'),
-    Device(name: 'Philips Pendant Lamp', image: '$_devices/lamp.png'),
+    Device(
+      name: 'Havells Glamax 9W B22',
+      image: '$_devices/bulb.png',
+      group: DeviceGroup.lights,
+    ),
+    Device(
+      name: 'Tapo TP-Link C210 360°',
+      image: '$_devices/camera.png',
+      group: DeviceGroup.security,
+    ),
+    Device(
+      name: 'Amazon Alexa 2',
+      image: '$_devices/speaker.png',
+      group: DeviceGroup.entertainment,
+    ),
+    Device(
+      name: 'Philips Pendant Lamp',
+      image: '$_devices/lamp.png',
+      group: DeviceGroup.lights,
+    ),
   ];
 
   /// Loại thiết bị ở màn "Add Devices".
@@ -223,13 +239,26 @@ abstract final class SampleData {
       image: '$_categories/camera.png',
       count: '22',
       models: [
-        Device(name: 'Tapo C201 360°', image: '$_models/tapo_c201.png'),
-        Device(name: 'Tapo C301 180°', image: '$_models/tapo_c301.png'),
+        Device(
+          name: 'Tapo C201 360°',
+          image: '$_models/tapo_c201.png',
+          group: DeviceGroup.security,
+        ),
+        Device(
+          name: 'Tapo C301 180°',
+          image: '$_models/tapo_c301.png',
+          group: DeviceGroup.security,
+        ),
         Device(
           name: 'Imou 360° 1080P Full HD Security Camera',
           image: '$_models/imou_360.png',
+          group: DeviceGroup.security,
         ),
-        Device(name: 'Tapo TP-Link C210', image: '$_models/tapo_c210.png'),
+        Device(
+          name: 'Tapo TP-Link C210',
+          image: '$_models/tapo_c210.png',
+          group: DeviceGroup.security,
+        ),
       ],
     ),
     DeviceCategory(

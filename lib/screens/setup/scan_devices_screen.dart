@@ -8,6 +8,7 @@ import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/device.dart';
 import '../../data/sample_data.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/home_switcher_header.dart';
@@ -150,12 +151,12 @@ class _ScanDevicesScreenState extends State<ScanDevicesScreen>
                   child: _phase == _Phase.done
                       ? PrimaryButton(
                           key: const ValueKey('continue'),
-                          label: 'Continue',
+                          label: context.l10n.continueLabel,
                           onPressed: _toRooms,
                         )
                       : GreyButton(
                           key: const ValueKey('stop'),
-                          label: 'Stop Scanning',
+                          label: context.l10n.stopScanning,
                           onPressed: _stop,
                         ),
                 ),
@@ -165,7 +166,7 @@ class _ScanDevicesScreenState extends State<ScanDevicesScreen>
       body: Column(
         children: [
           HomeSwitcherHeader(
-            homes: app.homes,
+            homes: app.homesOr(context.l10n.defaultHomeName),
             index: app.homeIndex,
             onChanged: app.selectHome,
           ),
@@ -211,7 +212,7 @@ class _ScanDevicesScreenState extends State<ScanDevicesScreen>
               ..._titles(),
               const SizedBox(height: 32),
               PrimaryButton(
-                label: 'Allow and Continue',
+                label: context.l10n.allowAndContinue,
                 onPressed: switch (_phase) {
                   _Phase.idle => _scan,
                   _ => _found.isEmpty ? null : _connect,
@@ -219,7 +220,7 @@ class _ScanDevicesScreenState extends State<ScanDevicesScreen>
               ),
               const SizedBox(height: 16),
               SecondaryButton(
-                label: 'Add Manually',
+                label: context.l10n.addManually,
                 onPressed: () => Navigator.push(
                   context,
                   smoothRoute(const AddDevicesScreen()),
@@ -228,8 +229,7 @@ class _ScanDevicesScreenState extends State<ScanDevicesScreen>
               const SizedBox(height: 24),
               const Spacer(flex: 2),
               Text(
-                'Make sure you have one or more smart devices that support '
-                'Wi-Fi or Bluetooth',
+                context.l10n.scanRequirement,
                 textAlign: TextAlign.center,
                 style: AppText.body(size: 16, color: AppColors.grey),
               ),
@@ -273,27 +273,25 @@ class _ScanDevicesScreenState extends State<ScanDevicesScreen>
   List<Widget> _titles() => [
     const SizedBox(height: 16),
     Text.rich(switch (_phase) {
-      _Phase.connecting => const TextSpan(text: 'Searching...'),
+      _Phase.connecting => TextSpan(text: context.l10n.searching),
       _Phase.done => TextSpan(
         children: [
-          const TextSpan(text: 'Found '),
+          TextSpan(text: context.l10n.foundPrefix),
           TextSpan(
             text: '${_found.length}',
             style: const TextStyle(color: AppColors.brand),
           ),
-          TextSpan(text: _found.length == 1 ? ' Device' : ' Devices'),
+          TextSpan(text: context.l10n.foundSuffix(_found.length)),
         ],
       ),
-      _ => const TextSpan(text: 'Search Devices'),
+      _ => TextSpan(text: context.l10n.searchDevices),
     }, style: AppText.bold(28)),
     const SizedBox(height: 8),
     Text(
       switch (_phase) {
-        _Phase.connecting =>
-          'Please make sure all your devices are connected to Wi-Fi or '
-              'Bluetooth',
-        _Phase.done => 'Can’t see your device? Please scan again',
-        _ => 'Allow us to check nearby devices with Bluetooth or Wi-Fi',
+        _Phase.connecting => context.l10n.scanConnectHint,
+        _Phase.done => context.l10n.cantSeeDevice,
+        _ => context.l10n.allowCheck,
       },
       textAlign: TextAlign.center,
       style: AppText.body(size: 16, color: AppColors.grey),
@@ -319,9 +317,9 @@ class _DeviceCard extends StatelessWidget {
     return DeviceTile(
       device: device,
       status: switch (status) {
-        _Link.connecting => 'Connecting...',
-        _Link.connected => 'Connected',
-        _Link.failed => 'Unable to connect',
+        _Link.connecting => context.l10n.connecting,
+        _Link.connected => context.l10n.connected,
+        _Link.failed => context.l10n.unableToConnect,
       },
       statusColor: switch (status) {
         _Link.connecting => AppColors.brand,
@@ -331,7 +329,7 @@ class _DeviceCard extends StatelessWidget {
       trailing: switch (status) {
         _Link.failed => IconButton(
           onPressed: onRetry,
-          tooltip: 'Retry',
+          tooltip: context.l10n.retry,
           icon: const Icon(Icons.sync, color: AppColors.dark),
         ),
         _Link.connecting => const SizedBox.square(

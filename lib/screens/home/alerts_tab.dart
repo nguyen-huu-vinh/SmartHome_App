@@ -5,6 +5,7 @@ import '../../core/theme.dart';
 import '../../data/activity_alert.dart';
 import '../../data/app_state.dart';
 import '../../data/home_device.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/device_controls.dart';
@@ -31,8 +32,8 @@ class _AlertsTabState extends State<AlertsTab> {
     final i = app.dismissAlert(a);
     if (i == null) return;
     context.toast(
-      'Notification dismissed',
-      action: 'Undo',
+      context.l10n.notificationDismissed,
+      action: context.l10n.undo,
       onAction: () => app.restoreAlert(i, a),
     );
   }
@@ -44,7 +45,7 @@ class _AlertsTabState extends State<AlertsTab> {
     if (!mounted) return;
     setState(() => _connecting.remove(a));
     if (AppScope.read(context).dismissAlert(a) != null) {
-      context.toast('Re-connected successfully');
+      context.toast(context.l10n.reconnected);
     }
   }
 
@@ -53,7 +54,7 @@ class _AlertsTabState extends State<AlertsTab> {
     final app = AppScope.of(context);
     final alerts = app.alerts;
     return TabPage.paged(
-      title: 'Activity Alerts',
+      title: context.l10n.activityAlerts,
       itemCount: alerts.length,
       hasMore: app.alertsHasMore,
       onLoadMore: app.loadMoreAlerts,
@@ -74,10 +75,10 @@ class _AlertsTabState extends State<AlertsTab> {
                 ),
         );
       },
-      empty: const EmptyState(
+      empty: EmptyState(
         icon: Icons.notifications_none_rounded,
-        message: 'No notifications yet',
-        padding: EdgeInsets.only(top: 80),
+        message: context.l10n.noNotifications,
+        padding: const EdgeInsets.only(top: 80),
       ),
     );
   }
@@ -180,7 +181,7 @@ class _SuggestionCard extends StatelessWidget {
                           spacing: 4,
                           children: [
                             Text(
-                              alert.ago,
+                              alert.ago(context.l10n),
                               style: AppText.body(color: AppColors.grey),
                             ),
                             Text.rich(
@@ -217,15 +218,16 @@ class _SuggestionCard extends StatelessWidget {
                             spacing: 12,
                             children: [
                               Text(
-                                'Turn Off After',
+                                context.l10n.turnOffAfter,
                                 style: AppText.body(size: 16),
                               ),
                               AppCard(
                                 radius: AppSizes.radiusS,
                                 color: AppColors.surface,
                                 shadow: null,
-                                semanticLabel:
-                                    'Turn off after $minutes minutes, change',
+                                semanticLabel: context.l10n.turnOffAfterChange(
+                                  minutes,
+                                ),
                                 onTap: onMinutes,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 18,
@@ -234,7 +236,7 @@ class _SuggestionCard extends StatelessWidget {
                                 child: AnimatedSwitcher(
                                   duration: AppMotion.fast,
                                   child: Text(
-                                    '$minutes Min',
+                                    context.l10n.minutesShort(minutes),
                                     key: ValueKey(minutes),
                                     style: AppText.body(size: 18),
                                   ),
@@ -301,7 +303,10 @@ class _DeviceAlertCard extends StatelessWidget {
           Row(
             spacing: 16,
             children: [
-              Text(alert.ago, style: AppText.body(color: AppColors.grey)),
+              Text(
+                alert.ago(context.l10n),
+                style: AppText.body(color: AppColors.grey),
+              ),
               Expanded(
                 child: SizedBox(
                   height: 48,
@@ -324,7 +329,7 @@ class _DeviceAlertCard extends StatelessWidget {
                         : FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              'Re-Connect',
+                              context.l10n.reconnect,
                               maxLines: 1,
                               style: AppText.body(size: 16),
                             ),

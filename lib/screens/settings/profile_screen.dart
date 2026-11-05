@@ -4,6 +4,7 @@ import '../../core/assets.dart';
 import '../../core/feedback.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/headers.dart';
@@ -49,7 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         email: _email.text.trim(),
       ),
     );
-    context.toast('Profile updated');
+    context.toast(context.l10n.profileUpdated);
     Navigator.pop(context);
   }
 
@@ -58,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: Column(
         children: [
-          const PageHeader(title: 'Profile'),
+          PageHeader(title: context.l10n.profile),
           Expanded(
             child: AutofillGroup(
               child: ListView(
@@ -68,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   AppTextField(
                     controller: _name,
-                    hint: 'Your name',
+                    hint: context.l10n.yourName,
                     prefix: const Icon(
                       Icons.person,
                       color: AppColors.brand,
@@ -88,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _email,
-                    hint: 'Your email address',
+                    hint: context.l10n.yourEmail,
                     prefix: AppIcon.email.widget(20),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
@@ -98,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ListenableBuilder(
                     listenable: _anyChange,
                     builder: (_, _) => PrimaryButton(
-                      label: 'Update',
+                      label: context.l10n.update,
                       onPressed: _valid ? _update : null,
                     ),
                   ),

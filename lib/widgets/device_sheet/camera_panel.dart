@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
 import '../../data/device_settings.dart';
+import '../../l10n/l10n.dart';
 import '../app_card.dart';
 import '../app_image.dart';
 import 'stat_card.dart';
@@ -53,7 +54,7 @@ class CameraFeed extends StatelessWidget {
                 color: const Color(0xCC1A1A1F),
                 child: Center(
                   child: Text(
-                    'Camera off',
+                    context.l10n.cameraOff,
                     style: AppText.body(size: 16, color: Colors.white),
                   ),
                 ),
@@ -145,8 +146,8 @@ class CameraStats extends StatelessWidget {
           child: StatCard(
             icon: const Icon(Icons.alarm_rounded, color: Colors.white),
             color: AppColors.brand,
-            value: '${camera.runHours} Hr',
-            label: 'Run time',
+            value: context.l10n.hoursShort(camera.runHours),
+            label: context.l10n.runTime,
           ),
         ),
         Expanded(
@@ -155,8 +156,8 @@ class CameraStats extends StatelessWidget {
             color: const Color(0xFFA77CF6),
             value: camera.quality.label,
             label: camera.quality == CameraQuality.defaultValue
-                ? 'Quality - Default'
-                : 'Quality',
+                ? context.l10n.qualityDefault
+                : context.l10n.quality,
             onTap: () => update(() => camera.quality = camera.quality.next),
           ),
         ),

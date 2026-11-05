@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'pressable.dart';
 
 // Các kiểu công tắc nguồn của thiết bị. Cùng 1 quy ước:
@@ -24,7 +25,7 @@ class PowerBox extends StatelessWidget {
     final radius = BorderRadius.circular(14);
     return Semantics(
       toggled: on,
-      label: 'Power',
+      label: context.l10n.power,
       child: Pressable(
         onTap: () => _toggle(onChanged, !on),
         scale: 0.94,
@@ -42,7 +43,7 @@ class PowerBox extends StatelessWidget {
           spacing: 14,
           children: [
             Text(
-              on ? 'ON' : 'OFF',
+              on ? context.l10n.on : context.l10n.off,
               style: AppText.body(
                 size: 16,
                 color: on ? AppColors.dark : AppColors.grey,
@@ -80,7 +81,7 @@ class PowerPill extends StatelessWidget {
     final radius = BorderRadius.circular(AppSizes.radiusS);
     return Semantics(
       toggled: on,
-      label: 'Power',
+      label: context.l10n.power,
       child: Pressable(
         onTap: () => _toggle(onChanged, !on),
         scale: 0.94,
@@ -109,7 +110,7 @@ class PowerPill extends StatelessWidget {
               ),
             ),
             Text(
-              on ? 'ON' : 'OFF',
+              on ? context.l10n.on : context.l10n.off,
               style: AppText.body(color: on ? AppColors.dark : AppColors.grey),
             ),
           ],
@@ -130,7 +131,7 @@ class PowerSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       toggled: on,
-      label: 'Power',
+      label: context.l10n.power,
       child: Pressable(
         onTap: () => _toggle(onChanged, !on),
         ripple: false,
@@ -181,7 +182,7 @@ class VerticalSwitch extends StatelessWidget {
         onTap: () {
           if (!active) _toggle(onChanged, value);
         },
-        semanticLabel: value ? 'Turn on' : 'Turn off',
+        semanticLabel: value ? context.l10n.turnOn : context.l10n.turnOff,
         scale: 0.92,
         borderRadius: radius,
         decoration: BoxDecoration(color: bg, borderRadius: radius),
@@ -202,7 +203,7 @@ class VerticalSwitch extends StatelessWidget {
 
     return Semantics(
       toggled: on,
-      label: 'Power',
+      label: context.l10n.power,
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
@@ -211,7 +212,10 @@ class VerticalSwitch extends StatelessWidget {
         ),
         child: Column(
           spacing: 4,
-          children: [half('OFF', false), half('ON', true)],
+          children: [
+            half(context.l10n.off, false),
+            half(context.l10n.on, true),
+          ],
         ),
       ),
     );

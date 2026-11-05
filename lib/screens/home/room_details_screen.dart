@@ -6,6 +6,7 @@ import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/home_device.dart';
 import '../../data/room.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_image.dart';
 import '../../widgets/badges.dart';
@@ -29,9 +30,9 @@ class RoomDetailsScreen extends StatelessWidget {
   /// Hỏi lại → xoá phòng, quay về; thông báo có nút hoàn tác.
   Future<void> _removeRoom(BuildContext context) async {
     final ok = await context.confirm(
-      title: 'Remove ${room.name}?',
-      message: 'This room will be removed from your home.',
-      confirmLabel: 'Remove',
+      title: context.l10n.removeRoomTitle(room.name),
+      message: context.l10n.removeRoomMessage,
+      confirmLabel: context.l10n.remove,
       destructive: true,
     );
     if (!ok || !context.mounted) return;
@@ -40,8 +41,8 @@ class RoomDetailsScreen extends StatelessWidget {
     if (i == null) return;
     Navigator.pop(context);
     context.toast(
-      '${room.name} removed',
-      action: 'Undo',
+      context.l10n.removedNamed(room.name),
+      action: context.l10n.undo,
       onAction: () => app.insertRoom(i, room),
     );
   }
@@ -68,26 +69,26 @@ class RoomDetailsScreen extends StatelessWidget {
           PageHeader(
             title: room.name,
             titleSize: 20,
-            subtitle: plural(devices.length, 'Device'),
+            subtitle: context.l10n.devicesCount(devices.length),
             leading: RoomBadge(room: room, size: 52, glow: true),
             actions: [
               PopupMenuButton<VoidCallback>(
-                tooltip: 'More',
+                tooltip: context.l10n.more,
                 icon: const Icon(Icons.more_horiz, color: AppColors.dark),
                 position: PopupMenuPosition.under,
                 onSelected: (action) => action(),
                 itemBuilder: (_) => [
                   PopupMenuItem(
                     value: () => _addDevice(context),
-                    child: const Text('Add New Device'),
+                    child: Text(context.l10n.addNewDevice),
                   ),
                   // Phải còn ít nhất 1 phòng.
                   if (app.canRemoveRoom)
                     PopupMenuItem(
                       value: () => _removeRoom(context),
-                      child: const Text(
-                        'Remove Room',
-                        style: TextStyle(color: AppColors.danger),
+                      child: Text(
+                        context.l10n.removeRoom,
+                        style: const TextStyle(color: AppColors.danger),
                       ),
                     ),
                 ],
@@ -126,14 +127,14 @@ class RoomDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                   ],
                   if (devices.isEmpty)
-                    const EmptyState(
+                    EmptyState(
                       icon: Icons.devices_other_rounded,
-                      message: 'No devices in this room yet',
-                      padding: EdgeInsets.fromLTRB(32, 32, 32, 24),
+                      message: context.l10n.noDevicesInRoom,
+                      padding: const EdgeInsets.fromLTRB(32, 32, 32, 24),
                     ),
                   _pad(
                     AddTile(
-                      label: 'Add New Device',
+                      label: context.l10n.addNewDevice,
                       onTap: () => _addDevice(context),
                       height: 56,
                     ),
@@ -209,8 +210,8 @@ class _TallTile extends StatelessWidget {
     final on = AppScope.of(context).isOn(device);
     // Camera luôn bật → "Connected"; còn lại theo công tắc.
     final status = device.switchable
-        ? (on ? 'Powered On' : 'Powered Off')
-        : (on ? 'Connected' : 'Offline');
+        ? (on ? context.l10n.poweredOn : context.l10n.poweredOff)
+        : (on ? context.l10n.connected : context.l10n.offline);
     return AppCard(
       radius: AppSizes.radiusL,
       padding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
@@ -233,7 +234,7 @@ class _TallTile extends StatelessWidget {
           const SizedBox(height: 6),
           StatusDot(status, active: on),
           const SizedBox(height: 10),
-          IconLabel(text: '${device.volts}V - Today'),
+          IconLabel(text: context.l10n.voltsToday(device.volts)),
           if (device.group == DeviceGroup.climate) ...[
             const SizedBox(height: 14),
             _TempControl(device: device, on: on),
@@ -273,9 +274,9 @@ class _TempControl extends StatelessWidget {
       child: Row(
         spacing: 8,
         children: [
-          button(Icons.remove_rounded, 'Temperature down', -1),
+          button(Icons.remove_rounded, context.l10n.temperatureDown, -1),
           Semantics(
-            label: 'Temperature ${ac.temp} degrees',
+            label: context.l10n.temperatureDegrees(ac.temp),
             child: ExcludeSemantics(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -290,7 +291,7 @@ class _TempControl extends StatelessWidget {
               ),
             ),
           ),
-          button(Icons.add_rounded, 'Temperature up', 1),
+          button(Icons.add_rounded, context.l10n.temperatureUp, 1),
         ],
       ),
     );
@@ -308,10 +309,10 @@ class _CleanerTile extends StatelessWidget {
     final app = AppScope.of(context);
     final s = app.cleaner(device);
     final state = s.charging
-        ? 'On Charge'
+        ? context.l10n.onCharge
         : app.isOn(device)
-        ? 'Cleaning'
-        : 'Idle';
+        ? context.l10n.cleaning
+        : context.l10n.idle;
     return AppCard(
       radius: AppSizes.radiusL,
       padding: const EdgeInsets.all(16),
@@ -334,7 +335,7 @@ class _CleanerTile extends StatelessWidget {
                 Row(
                   spacing: 8,
                   children: [
-                    const Flexible(child: StatusDot('Connected')),
+                    Flexible(child: StatusDot(context.l10n.connected)),
                     BatteryBadge(level: s.battery, charging: s.charging),
                   ],
                 ),

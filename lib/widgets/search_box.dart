@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/feedback.dart';
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 
 /// Ô tìm kiếm nền trắng, bóng nhẹ. Đang có chữ → nút xoá nhanh;
 /// chưa có chữ → nút mic.
@@ -71,17 +72,17 @@ class _SearchBoxState extends State<SearchBox> {
             listenable: _text,
             builder: (context, _) => _text.text.isEmpty
                 ? IconButton(
-                    tooltip: 'Voice search',
+                    tooltip: context.l10n.voiceSearch,
                     // TODO: tìm bằng giọng nói.
                     onPressed: () =>
-                        context.toast('Voice search is coming soon'),
+                        context.toast(context.l10n.voiceSearchSoon),
                     icon: const Icon(
                       Icons.mic_none_rounded,
                       color: AppColors.dark,
                     ),
                   )
                 : IconButton(
-                    tooltip: 'Clear search',
+                    tooltip: context.l10n.clearSearch,
                     onPressed: _clear,
                     icon: const Icon(
                       Icons.cancel_rounded,

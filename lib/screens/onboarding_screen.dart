@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../core/assets.dart';
 import '../core/routes.dart';
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import '../widgets/app_image.dart';
 import 'auth/login_screen.dart';
 
@@ -16,33 +17,32 @@ typedef _Intro = ({
   String desc,
 });
 
-final _pages = <_Intro>[
+List<_Intro> _introPages(AppLocalizations l) => [
   (
     image: AppImages.onboarding[0],
-    before: 'Control Your ',
-    highlight: 'Uncontrolled',
-    after: '\nDevices with Hoome',
-    desc: 'All New AI Home smart devices control at your fingertips',
+    before: l.onboarding1Before,
+    highlight: l.onboarding1Highlight,
+    after: l.onboarding1After,
+    desc: l.onboarding1Desc,
   ),
   (
     image: AppImages.onboarding[1],
-    before: 'Seamless ',
-    highlight: 'Integration',
-    after: ' for\nEvery Smart Device',
-    desc:
-        'Connect and manage all your home gadgets in one powerful app — '
-        'instantly and effortlessly',
+    before: l.onboarding2Before,
+    highlight: l.onboarding2Highlight,
+    after: l.onboarding2After,
+    desc: l.onboarding2Desc,
   ),
   (
     image: AppImages.onboarding[2],
-    before: 'Smart, Secure, and ',
-    highlight: 'Always',
-    after: '\nin Sync',
-    desc:
-        'Experience peace of mind with real-time control, monitoring, and '
-        'automation — wherever you are.',
+    before: l.onboarding3Before,
+    highlight: l.onboarding3Highlight,
+    after: l.onboarding3After,
+    desc: l.onboarding3Desc,
   ),
 ];
+
+/// Số trang giới thiệu.
+const _pageCount = 3;
 
 /// 3 trang giới thiệu, vuốt hoặc bấm Next; trang cuối → đăng nhập.
 class OnboardingScreen extends StatefulWidget {
@@ -57,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _index = 0;
 
   bool get _first => _index == 0;
-  bool get _last => _index == _pages.length - 1;
+  bool get _last => _index == _pageCount - 1;
 
   void _go(int page) {
     HapticFeedback.selectionClick();
@@ -104,14 +104,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Expanded(
                 child: PageView.builder(
                   controller: _ctrl,
-                  itemCount: _pages.length,
+                  itemCount: _pageCount,
                   onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (_, i) => _Page(_pages[i], i, _ctrl),
+                  itemBuilder: (_, i) =>
+                      _Page(_introPages(context.l10n)[i], i, _ctrl),
                 ),
               ),
               const SizedBox(height: 24),
               Semantics(
-                label: 'Page ${_index + 1} of ${_pages.length}',
+                label: context.l10n.pageOf(_index + 1, _pageCount),
                 child: SizedBox(
                   width: 124,
                   height: 8,
@@ -144,14 +145,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Row(
                 children: [
                   _button(
-                    _first ? 'Skip Intro' : 'Back',
-                    () => _go(_first ? _pages.length - 1 : _index - 1),
+                    _first ? context.l10n.skipIntro : context.l10n.back,
+                    () => _go(_first ? _pageCount - 1 : _index - 1),
                     const Color(0xFFF4F5F7),
                     AppColors.dark,
                   ),
                   const Spacer(),
                   _button(
-                    _last ? 'Let’s Go ✨' : 'Next',
+                    _last ? context.l10n.letsGo : context.l10n.next,
                     _last ? _start : () => _go(_index + 1),
                     AppColors.dark,
                     Colors.white,

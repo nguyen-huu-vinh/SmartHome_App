@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../core/assets.dart';
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 
 /// Nền + viền của ô nhập, dùng chung cho các ô giả dạng ô nhập (vd: mã vùng).
 const fieldBoxDecoration = BoxDecoration(
@@ -125,7 +126,9 @@ class _AppTextFieldState extends State<AppTextField> {
             ),
             if (widget.password)
               IconButton(
-                tooltip: _hide ? 'Show password' : 'Hide password',
+                tooltip: _hide
+                    ? context.l10n.showPassword
+                    : context.l10n.hidePassword,
                 onPressed: () => setState(() => _hide = !_hide),
                 style: IconButton.styleFrom(
                   fixedSize: const Size.square(40),

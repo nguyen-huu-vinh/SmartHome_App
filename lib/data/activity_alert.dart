@@ -27,11 +27,4 @@ class ActivityAlert {
 
   /// Gợi ý tắt đèn: phòng có dãy đèn sẽ bị tắt.
   final String? room;
-
-  String get ago => switch (age) {
-    Duration(inMinutes: < 1) => 'Just now',
-    Duration(inHours: < 1) => '${age.inMinutes} Min ago',
-    Duration(inDays: < 1) => '${age.inHours} Hr ago',
-    _ => '${age.inDays} Day ago',
-  };
 }

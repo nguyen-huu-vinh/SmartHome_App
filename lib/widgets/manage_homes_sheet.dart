@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'app_buttons.dart';
 import 'app_card.dart';
 import 'app_icons.dart';
@@ -68,7 +69,7 @@ class _HomesSheetState extends State<_HomesSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SheetHeader(title: 'Manage Homes'),
+            SheetHeader(title: context.l10n.manageHomes),
             const SizedBox(height: 12),
             // Nhiều nhà → danh sách cuộn, nút Continue vẫn nằm dưới.
             Flexible(
@@ -89,12 +90,12 @@ class _HomesSheetState extends State<_HomesSheet> {
                         onTap: () => setState(() => _index = i),
                         onRemove: canRemove ? () => _remove(i) : null,
                       )
-                    : AddTile(label: 'Add Home', onTap: _add),
+                    : AddTile(label: context.l10n.addHome, onTap: _add),
               ),
             ),
             const SizedBox(height: 24),
             PrimaryButton(
-              label: 'Continue',
+              label: context.l10n.continueLabel,
               onPressed: () =>
                   Navigator.pop(context, (homes: _homes, index: _index)),
             ),
@@ -151,7 +152,7 @@ class _HomeTile extends StatelessWidget {
           ),
           // Nút xoá có sẵn lề vùng bấm 8 (cũng là khoảng cách với chữ).
           if (onRemove != null)
-            RemoveBadge(label: 'Remove $name', onTap: onRemove),
+            RemoveBadge(label: context.l10n.removeNamed(name), onTap: onRemove),
         ],
       ),
     );

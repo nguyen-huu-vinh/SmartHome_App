@@ -5,6 +5,7 @@ import '../../core/feedback.dart';
 import '../../core/routes.dart';
 import '../../core/validators.dart';
 import '../../data/app_state.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/auth_layout.dart';
 import '../../widgets/phone_field.dart';
@@ -43,7 +44,7 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
     return AuthLayout(
       heroMaxFraction: 0.36,
       children: [
-        const AuthHeader(title: 'Welcome Back'),
+        AuthHeader(title: context.l10n.welcomeBack),
         const SizedBox(height: 24),
         PhoneField(
           controller: _phone,
@@ -55,7 +56,7 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
         ListenableBuilder(
           listenable: _phone,
           builder: (_, _) => PrimaryButton(
-            label: 'Continue',
+            label: context.l10n.continueLabel,
             onPressed: isValidPhone(_phone.text) ? _continue : null,
           ),
         ),
@@ -65,20 +66,18 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
         SocialRow(
           children: [
             SocialButton(
-              tooltip: 'Continue with Apple',
+              tooltip: context.l10n.continueWithApple,
               icon: const Icon(Icons.apple, size: 28),
-              onPressed: () =>
-                  context.toast('Sign in with Apple is coming soon'),
+              onPressed: () => context.toast(context.l10n.signInAppleSoon),
             ),
             SocialButton(
-              tooltip: 'Continue with Google',
+              tooltip: context.l10n.continueWithGoogle,
               icon: AppIcon.google.widget(28),
-              onPressed: () =>
-                  context.toast('Sign in with Google is coming soon'),
+              onPressed: () => context.toast(context.l10n.signInGoogleSoon),
             ),
             // Quay lại màn đăng nhập bằng email.
             SocialButton(
-              tooltip: 'Continue with email',
+              tooltip: context.l10n.continueWithEmail,
               icon: const Icon(Icons.email_rounded, size: 26),
               onPressed: () => Navigator.pop(context),
             ),
@@ -86,8 +85,8 @@ class _LoginPhoneScreenState extends State<LoginPhoneScreen> {
         ),
         const SizedBox(height: 24),
         AuthFooter(
-          text: 'Don’t have an account? ',
-          link: 'Create Account',
+          text: context.l10n.noAccount,
+          link: context.l10n.createAccount,
           onTap: () => Navigator.push(context, riseRoute(const SignupScreen())),
         ),
       ],

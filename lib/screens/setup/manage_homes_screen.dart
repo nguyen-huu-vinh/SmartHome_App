@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_icons.dart';
 import '../../widgets/badges.dart';
@@ -56,7 +57,9 @@ class _ManageHomesScreenState extends State<ManageHomesScreen> {
     // Ô chưa đặt tên → "Home 1", "Home 2", ...
     final names = [
       for (var i = 0; i < _homes.length; i++)
-        _homes[i].text.trim().isEmpty ? 'Home ${i + 1}' : _homes[i].text.trim(),
+        _homes[i].text.trim().isEmpty
+            ? context.l10n.homeNumbered(i + 1)
+            : _homes[i].text.trim(),
     ];
     AppScope.read(context).setHomes(names);
     Navigator.push(
@@ -69,8 +72,8 @@ class _ManageHomesScreenState extends State<ManageHomesScreen> {
   Widget build(BuildContext context) {
     final empty = _homes.isEmpty;
     return LargeTitlePage(
-      title: empty ? 'Create Home' : 'Manage Homes',
-      subtitle: 'Here you can add, update or delete your homes',
+      title: empty ? context.l10n.createHome : context.l10n.manageHomes,
+      subtitle: context.l10n.manageHomesSubtitle,
       children: [
         if (empty)
           _addTile()
@@ -90,13 +93,16 @@ class _ManageHomesScreenState extends State<ManageHomesScreen> {
                 i < _homes.length ? _homeTile(_homes[i]) : _addTile(),
           ),
         const SizedBox(height: 24),
-        PrimaryButton(label: 'Continue', onPressed: empty ? null : _continue),
+        PrimaryButton(
+          label: context.l10n.continueLabel,
+          onPressed: empty ? null : _continue,
+        ),
       ],
     );
   }
 
   Widget _addTile() =>
-      AddTile(label: 'Add Home', height: _tileHeight, onTap: _add);
+      AddTile(label: context.l10n.addHome, height: _tileHeight, onTap: _add);
 
   Widget _homeTile(TextEditingController c) => Container(
     key: ObjectKey(c),
@@ -121,13 +127,13 @@ class _ManageHomesScreenState extends State<ManageHomesScreen> {
               isDense: true,
               border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
-              hintText: 'Home Name',
+              hintText: context.l10n.homeName,
               hintStyle: AppText.body(size: 16, color: AppColors.grey),
             ),
           ),
         ),
         // Nút xoá có sẵn lề vùng bấm 8 (cũng là khoảng cách với chữ).
-        RemoveBadge(label: 'Remove home', onTap: () => _remove(c)),
+        RemoveBadge(label: context.l10n.removeHome, onTap: () => _remove(c)),
       ],
     ),
   );

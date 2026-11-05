@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
 import '../../data/device_settings.dart';
+import '../../l10n/l10n.dart';
 import '../app_image.dart';
 import '../pressable.dart';
 
@@ -71,7 +72,7 @@ class RemoteBadge extends StatelessWidget {
           backgroundColor: c.withValues(alpha: 0.12),
           child: CircleAvatar(radius: 5, backgroundColor: c),
         ),
-        Text('Remote', style: AppText.body(size: 16)),
+        Text(context.l10n.remote, style: AppText.body(size: 16)),
       ],
     );
   }
@@ -104,25 +105,25 @@ class AcRemote extends StatelessWidget {
       children: [
         row(
           _PadButton(
-            label: 'Mode',
-            value: ac.mode.label,
+            label: context.l10n.mode,
+            value: ac.mode.label(context.l10n),
             onTap: () => edit((a) => a.mode = a.mode.next),
           ),
           _RoundButton(
             icon: Icons.arrow_drop_up_rounded,
-            tooltip: 'Temperature up',
+            tooltip: context.l10n.temperatureUp,
             onTap: () => edit((a) => a.setTemp(a.temp + 1)),
           ),
           _PadButton(
-            label: 'Fan Speed',
-            value: ac.fan.label,
+            label: context.l10n.fanSpeed,
+            value: ac.fan.label(context.l10n),
             onTap: () => edit((a) => a.fan = a.fan.next),
           ),
         ),
         row(
           _PadButton(
-            label: 'Swing',
-            semanticLabel: 'Swing left',
+            label: context.l10n.swing,
+            semanticLabel: context.l10n.swingLeft,
             leading: Icons.arrow_left_rounded,
             stadium: true,
             active: ac.swingLeft,
@@ -130,13 +131,13 @@ class AcRemote extends StatelessWidget {
           ),
           _RoundButton(
             icon: Icons.sync_rounded,
-            tooltip: 'Auto swing',
+            tooltip: context.l10n.autoSwing,
             active: ac.autoSwing,
             onTap: () => edit((a) => a.autoSwing = !a.autoSwing),
           ),
           _PadButton(
-            label: 'Swing',
-            semanticLabel: 'Swing right',
+            label: context.l10n.swing,
+            semanticLabel: context.l10n.swingRight,
             trailing: Icons.arrow_right_rounded,
             stadium: true,
             active: ac.swingRight,
@@ -145,17 +146,17 @@ class AcRemote extends StatelessWidget {
         ),
         row(
           _PadButton(
-            label: 'Energy Ctrl',
+            label: context.l10n.energyCtrl,
             active: ac.energySaving,
             onTap: () => edit((a) => a.energySaving = !a.energySaving),
           ),
           _RoundButton(
             icon: Icons.arrow_drop_down_rounded,
-            tooltip: 'Temperature down',
+            tooltip: context.l10n.temperatureDown,
             onTap: () => edit((a) => a.setTemp(a.temp - 1)),
           ),
           _PadButton(
-            label: 'High Cooling',
+            label: context.l10n.highCooling,
             active: ac.highCooling,
             onTap: () => edit((a) => a.highCooling = !a.highCooling),
           ),

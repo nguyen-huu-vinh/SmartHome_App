@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'pressable.dart';
 
 final _shape = RoundedRectangleBorder(
@@ -135,7 +136,7 @@ class AppBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: 'Back',
+      message: context.l10n.back,
       child: Pressable(
         onTap: () => Navigator.maybePop(context),
         scale: 0.9,
@@ -203,7 +204,7 @@ class OrDivider extends StatelessWidget {
       spacing: 16,
       children: [
         const Expanded(child: Divider(color: AppColors.border)),
-        Text('Or', style: AppText.body(color: AppColors.grey)),
+        Text(context.l10n.or, style: AppText.body(color: AppColors.grey)),
         const Expanded(child: Divider(color: AppColors.border)),
       ],
     );

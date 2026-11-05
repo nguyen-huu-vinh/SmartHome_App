@@ -32,13 +32,13 @@ class Profile {
 
 /// Các công tắc ở tab Settings. Thêm tuỳ chọn mới: thêm 1 dòng ở đây,
 /// tab Settings tự hiện thêm 1 công tắc.
+/// Tên hiển thị: `p.label(context.l10n)` (xem `l10n.dart`).
 enum Preference {
-  wireless('Wireless Connectivity', Icons.wifi_rounded, true),
-  notifications('Get Notifications', Icons.notifications_rounded, false),
-  saveDeviceData('Save device data', Icons.download_rounded, false);
+  wireless(Icons.wifi_rounded, true),
+  notifications(Icons.notifications_rounded, false),
+  saveDeviceData(Icons.download_rounded, false);
 
-  const Preference(this.label, this.icon, this.initial);
-  final String label;
+  const Preference(this.icon, this.initial);
   final IconData icon;
 
   /// Giá trị khi mới cài app.

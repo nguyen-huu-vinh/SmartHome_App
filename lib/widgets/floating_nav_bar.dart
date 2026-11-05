@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import '../l10n/l10n.dart';
 import 'app_icons.dart';
 import 'badges.dart';
 import 'pressable.dart';
 
 /// Các tab của thanh điều hướng; [add] là nút hành động, không phải tab.
 enum NavTab {
-  home('Home'),
-  rooms('Rooms'),
-  add('Add device'),
-  alerts('Notifications'),
-  settings('Settings');
+  home,
+  rooms,
+  add,
+  alerts,
+  settings;
 
-  const NavTab(this.label);
-  final String label;
+  String label(AppLocalizations l) => switch (this) {
+    home => l.navHome,
+    rooms => l.navRooms,
+    add => l.navAddDevice,
+    alerts => l.navNotifications,
+    settings => l.navSettings,
+  };
 }
 
 /// Thanh điều hướng dạng viên thuốc nổi ở đáy màn hình.
@@ -28,6 +34,7 @@ class FloatingNavBar extends StatelessWidget {
     required this.current,
     required this.onTap,
     this.badges = const {},
+    this.targets = const {},
   });
 
   final NavTab current;
@@ -35,6 +42,9 @@ class FloatingNavBar extends StatelessWidget {
 
   /// Số đếm trên icon (VD: số thông báo chưa xử lý).
   final Map<NavTab, int> badges;
+
+  /// Nhãn gắn vào từng nút (để phần giới thiệu app tìm ra vị trí).
+  final Map<NavTab, GlobalKey> targets;
 
   static const _button = 54.0;
 
@@ -89,7 +99,8 @@ class FloatingNavBar extends StatelessWidget {
                 children: [
                   for (final tab in NavTab.values)
                     Tooltip(
-                      message: tab.label,
+                      key: targets[tab],
+                      message: tab.label(context.l10n),
                       child: Pressable(
                         onTap: () => onTap(tab),
                         haptic: true,

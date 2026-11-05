@@ -7,6 +7,7 @@ import '../../core/feedback.dart';
 import '../../core/routes.dart';
 import '../../core/theme.dart';
 import '../../core/validators.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/app_buttons.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/auth_layout.dart';
@@ -55,7 +56,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   // TODO: gọi API gửi lại mã.
   void _resend() {
     setState(_startTimer);
-    context.toast('A new code has been sent to your email');
+    context.toast(context.l10n.newCodeSent);
   }
 
   // TODO: gọi API kiểm tra mã.
@@ -73,8 +74,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
       heroMaxFraction: 0.375,
       children: [
         AuthHeader(
-          title: 'Verify That’s You',
-          subtitle: 'We just sent a 6-digit verification code to your email ',
+          title: context.l10n.verifyTitle,
+          subtitle: context.l10n.verifySubtitle,
           subtitleExtra: [
             TextSpan(
               text: maskEmail(widget.email),
@@ -85,7 +86,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         const SizedBox(height: 24),
         AppTextField(
           controller: _code,
-          hint: 'Enter Code',
+          hint: context.l10n.enterCode,
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           maxLength: _codeLength,
@@ -105,7 +106,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
               scale: 0.95,
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Text(
-                'Resend Code',
+                context.l10n.resendCode,
                 style: AppText.link(
                   size: 16,
                   color: canResend ? AppColors.dark : AppColors.grey,
@@ -123,14 +124,14 @@ class _VerifyScreenState extends State<VerifyScreen> {
         ListenableBuilder(
           listenable: _code,
           builder: (_, _) => PrimaryButton(
-            label: 'Continue',
+            label: context.l10n.continueLabel,
             onPressed: _code.text.length == _codeLength ? _continue : null,
           ),
         ),
         const SizedBox(height: 14),
         Center(
           child: LinkButton(
-            label: 'Change email?',
+            label: context.l10n.changeEmail,
             style: AppText.link(size: 16, color: AppColors.grey),
             onTap: () => Navigator.pop(context),
           ),

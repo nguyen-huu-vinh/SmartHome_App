@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
 import '../../data/device_settings.dart';
+import '../../l10n/l10n.dart';
 import '../app_image.dart';
 import 'stat_card.dart';
 
@@ -129,8 +130,8 @@ class LightPanel extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              legend('Warm', const Color(0xFFD69E1E)),
-              legend('Cool', AppColors.brand),
+              legend(context.l10n.warm, const Color(0xFFD69E1E)),
+              legend(context.l10n.cool, AppColors.brand),
             ],
           ),
         ),
@@ -142,16 +143,18 @@ class LightPanel extends StatelessWidget {
               child: StatCard(
                 icon: const Icon(Icons.alarm_rounded, color: Colors.white),
                 color: AppColors.brand,
-                value: '${light.runHours.toString().padLeft(2, '0')} Hr',
-                label: 'Run time',
+                value: context.l10n.hoursShort(
+                  light.runHours.toString().padLeft(2, '0'),
+                ),
+                label: context.l10n.runTime,
               ),
             ),
             Expanded(
               child: StatCard(
                 icon: const Icon(Icons.eco_rounded, color: Colors.white),
                 color: const Color(0xFFDDB24F),
-                value: '${light.aqi} AQI',
-                label: light.aqiLabel,
+                value: context.l10n.aqiValue(light.aqi),
+                label: light.aqiLabel(context.l10n),
               ),
             ),
           ],
@@ -181,10 +184,11 @@ class _WarmthSlider extends StatelessWidget {
         final x = value * (w - _height);
         // Trình đọc màn hình: tăng/giảm mỗi lần 10%.
         double step(double d) => (value + d).clamp(0.0, 1.0);
-        String describe(double v) => '${(v * 100).round()}% cool';
+        String describe(double v) =>
+            context.l10n.percentCool((v * 100).round());
         return Semantics(
           slider: true,
-          label: 'Color temperature',
+          label: context.l10n.colorTemperature,
           value: describe(value),
           increasedValue: describe(step(0.1)),
           decreasedValue: describe(step(-0.1)),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/feedback.dart';
 import '../../core/theme.dart';
 import '../../data/app_state.dart';
 import '../../data/home_device.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/device_cards.dart';
 import '../../widgets/headers.dart';
 import '../../widgets/paged_list.dart';
@@ -21,8 +21,8 @@ class DeviceListScreen extends StatelessWidget {
       body: Column(
         children: [
           PageHeader(
-            title: group.listTitle,
-            subtitle: plural(items.length, group.unit),
+            title: group.listTitle(context.l10n),
+            subtitle: group.count(context.l10n, items.length),
           ),
           Expanded(
             child: PagedList(
